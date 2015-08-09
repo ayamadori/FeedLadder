@@ -1,0 +1,47 @@
+﻿<phone:PhoneApplicationPage 
+    x:Class="FeedLadder.SettingPage"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
+    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
+    FontFamily="{StaticResource PhoneFontFamilyNormal}"
+    FontSize="{StaticResource PhoneFontSizeMediumLarge}" 
+    SupportedOrientations="Portrait" Orientation="Portrait"
+    shell:SystemTray.IsVisible="True" Loaded="PhoneApplicationPage_Loaded"
+    Language="ja-JP">
+
+    <!--LayoutRoot は、すべてのページ コンテンツが配置されるルート グリッドです-->
+    <Grid x:Name="LayoutRoot" Background="Transparent">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+
+        <!--TitlePanel は、アプリケーション名とページ タイトルを格納します-->
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,0">
+            <!--① タイトルの設定の追加-->
+            <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource PhoneTextNormalStyle}"/>
+            <TextBlock x:Name="PageTitle" Text="settings" Margin="9,0,0,0" Style="{StaticResource PhoneTextTitle1Style}" FontSize="56" />
+        </StackPanel>
+
+        <!--ContentPanel - 追加コンテンツをここに入力します-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
+            <StackPanel HorizontalAlignment="Left" Height="639" VerticalAlignment="Top" Width="456">
+                <TextBlock TextWrapping="Wrap" Text="Username" Style="{StaticResource PhoneTextLargeStyle}" Margin="12,0" Height="43"/>
+                <TextBox x:Name="usernameTextBox" TextWrapping="Wrap" Margin="0" Height="72" />
+                <TextBlock TextWrapping="Wrap" Text="Password" Style="{StaticResource PhoneTextLargeStyle}" Margin="12,0" Height="43" />
+                <PasswordBox x:Name="passwordBox" Margin="0" Height="72"/>
+                <TextBlock TextWrapping="Wrap" Text="Sort" Style="{StaticResource PhoneTextLargeStyle}" Margin="12,0" Height="43" />
+                <StackPanel Orientation="Horizontal">
+                    <RadioButton x:Name="radioButton1" Content="Folder" GroupName="SortGroup" Margin="0,0,0,28" d:LayoutOverrides="Height" HorizontalAlignment="Left" Checked="radioButton_Checked"/>
+                    <RadioButton x:Name="radioButton2" Content="Rate" GroupName="SortGroup" Margin="0,0,0,28" d:LayoutOverrides="Height" Checked="radioButton_Checked"/>
+                </StackPanel>
+                <Button Content="Save (Please restart app)" Click="Button_Click" Margin="0" Height="72"/>
+            </StackPanel>
+        </Grid>
+    </Grid>
+
+</phone:PhoneApplicationPage>
