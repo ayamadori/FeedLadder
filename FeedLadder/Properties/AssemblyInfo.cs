@@ -11,7 +11,7 @@ using System.Resources;
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
 [assembly: AssemblyProduct("FeedLadder")]
-[assembly: AssemblyCopyright("Copyright © Ayamadori 2012")]
+[assembly: AssemblyCopyright("Copyright © Ayamadori 2015")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 

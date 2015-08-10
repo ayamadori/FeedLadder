@@ -349,7 +349,8 @@ namespace FeedLadder
             // Mark this feed as read
             int group = (App.Current as App).GroupIndex;
             int item = (App.Current as App).ItemIndex;
-            (App.Current as App).SubscriptionList[group][item].UnreadCount = null;
+            //(App.Current as App).SubscriptionList[group][item].UnreadCount = null;
+            (App.Current as App).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
             if (item == 0)
