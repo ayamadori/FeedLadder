@@ -4,7 +4,7 @@
   <Languages xmlns="">
     <Language code="en" />
   </Languages>
-  <App xmlns="" ProductID="{5e27ff1d-25f7-4815-aa11-e85a5c07166a}" Title="Feedladder" RuntimeType="Silverlight" Version="1.0.0.0" Genre="apps.normal" Author="ayamadori" Description="A simple and unofficial client for Live Dwango Reader." Publisher="ayamadori" PublisherID="{9b7658c2-c5bc-47bb-bf68-fb8281e22ca3}">
+  <App xmlns="" ProductID="{5e27ff1d-25f7-4815-aa11-e85a5c07166a}" Title="Feedladder" RuntimeType="Silverlight" Version="1.0.0.1" Genre="apps.normal" Author="ayamadori" Description="A simple and unofficial client for Live Dwango Reader." Publisher="ayamadori" PublisherID="{9b7658c2-c5bc-47bb-bf68-fb8281e22ca3}">
     <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />

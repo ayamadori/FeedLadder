@@ -49,11 +49,12 @@
                                 </ObjectAnimationUsingKeyFrames>
                             </Storyboard>
                         </VisualState>
+                        <VisualState x:Name="Unread"/>
                     </VisualStateGroup>
                 </VisualStateManager.VisualStateGroups>
                 <StackPanel Margin="0,10,0,10" Orientation="Horizontal" Grid.ColumnSpan="2">
                     <i:Interaction.Behaviors>
-                        <ec:DataStateBehavior Value="true" TrueState="IsRead" Binding="{Binding isRead}"/>
+                        <ec:DataStateBehavior Value="true" TrueState="IsRead" Binding="{Binding isRead}" FalseState="Unread"/>
                     </i:Interaction.Behaviors>
                     <TextBlock x:Name="textBlock" Text="{Binding Title}" Margin="0" Style="{StaticResource PhoneTextTitle2Style}" TextWrapping="Wrap" HorizontalAlignment="Left" Width="340" VerticalAlignment="Center" Foreground="{StaticResource PhoneForegroundBrush}"/>
                     <Border x:Name="border" BorderThickness="2" HorizontalAlignment="Right" Height="70" VerticalAlignment="Center" Width="70" Background="{StaticResource PhoneAccentBrush}">
