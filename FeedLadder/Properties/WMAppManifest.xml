@@ -5,7 +5,7 @@
     <Language code="en" />
   </Languages>
   <App xmlns="" ProductID="{5e27ff1d-25f7-4815-aa11-e85a5c07166a}" Title="Feedladder" RuntimeType="Silverlight" Version="1.0.0.1" Genre="apps.normal" Author="ayamadori" Description="A simple and unofficial client for Live Dwango Reader." Publisher="ayamadori" PublisherID="{9b7658c2-c5bc-47bb-bf68-fb8281e22ca3}">
-    <IconPath IsRelative="true" IsResource="false">ApplicationIcon.png</IconPath>
+    <IconPath IsRelative="true" IsResource="false">Assets\SquareTile71x71.png</IconPath>
     <Capabilities>
       <Capability Name="ID_CAP_NETWORKING" />
       <Capability Name="ID_CAP_WEBBROWSERCOMPONENT" />
@@ -16,9 +16,9 @@
     <Tokens>
       <PrimaryToken TokenID="RssFeedReaderToken" TaskName="_default">
         <TemplateFlip>
-          <SmallImageURI IsResource="false" IsRelative="true">ApplicationIcon.png</SmallImageURI>
+          <SmallImageURI IsResource="false" IsRelative="true">Assets\SquareTile71x71.png</SmallImageURI>
           <Count>0</Count>
-          <BackgroundImageURI IsResource="false" IsRelative="true">Background.png</BackgroundImageURI>
+          <BackgroundImageURI IsResource="false" IsRelative="true">Assets\SquareTile150x150.png</BackgroundImageURI>
           <Title>Feedladder</Title>
           <BackContent>
           </BackContent>
