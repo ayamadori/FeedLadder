@@ -27,7 +27,7 @@ License
 GNU GENERAL PUBLIC LICENSE Version 3  
 http://www.gnu.org/licenses/gpl-3.0.html
 
-Version History
+Version history
 ---------------
 * v1.0.0  
   This version (and newer) supports Windows Phone 8.1 only  
