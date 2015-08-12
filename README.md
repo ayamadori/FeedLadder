@@ -27,15 +27,12 @@ License
 GNU GENERAL PUBLIC LICENSE Version 3  
 http://www.gnu.org/licenses/gpl-3.0.html
 
-Latest version
---------------
+Version History
+---------------
 * v1.0.0  
   This version (and newer) supports Windows Phone 8.1 only  
   Support to sort feeds by Rate  
   Minor fix & improvements
-
-Version History
----------------
 * v0.9.5  
   Add features of showing pinned item  
   Modify some UI
