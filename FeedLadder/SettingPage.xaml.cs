@@ -1,78 +1,87 @@
 ﻿using System;
-using System.Windows;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using System.IO.IsolatedStorage;
-using System.Windows.Controls;
+using System.Collections.ObjectModel;
+using Windows.Storage;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
+using Windows.Web.Http;
+
+// 空白ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234238 を参照してください
 
 namespace FeedLadder
 {
-    public partial class SettingPage : PhoneApplicationPage
+    /// <summary>
+    /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
+    /// </summary>
+    public sealed partial class SettingPage : Page
     {
-        private ProtectedSettingDictionary account;
-
-        // http://blog.ch3cooh.jp/entry/20110407/1302201270
-        private IsolatedStorageSettings sort;
-        private string sortMode;
+        private const string logoutURL = "http://reader.livedwango.com/reader/logout";
 
         public SettingPage()
         {
-            InitializeComponent();
-            account = new ProtectedSettingDictionary("ProtectedStore");
-            sort = IsolatedStorageSettings.ApplicationSettings;
+            this.InitializeComponent();
 
+            ObservableCollection<string> items = new ObservableCollection<string>();
+            items.Add("Folder");
+            items.Add("Rating");
+            SortModeComboBox.DataContext = items;
         }
 
-        private void PhoneApplicationPage_Loaded(object sender, RoutedEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
-            if (this.account.ContainsKey("UserName"))
-            {
-                this.usernameTextBox.Text = this.account["UserName"];
-            }
-            if (this.account.ContainsKey("Password"))
-            {
-                this.passwordBox.Password = this.account["Password"];
-            }
+            base.OnNavigatedTo(e);
 
-            sortMode = "";
-            if (this.sort.TryGetValue<string>("Sort", out sortMode))
+            if (e.NavigationMode == NavigationMode.New)
             {
-                switch(sortMode)
+                var roamingSettings = ApplicationData.Current.RoamingSettings;
+                // Read data from a simple setting
+                string sortMode = roamingSettings.Values["SortModeString"] as string;
+                if (sortMode == null)
                 {
-                    case "Folder":
-                        radioButton1.IsChecked = true;
-                        break;
-                    case "Rate":
-                        radioButton2.IsChecked = true;
-                        break;
+                    // Default is Folder
+                    sortMode = "Folder";
+                    roamingSettings.Values["SortModeString"] = sortMode;
                 }
-
+                SortModeComboBox.SelectedItem = sortMode;
+                object adBlockEnable = roamingSettings.Values["AdBlockEnableBool"];
+                if (adBlockEnable == null)
+                    AdBlockSwitch.IsOn = false; // Default is no blocking
+                else
+                    AdBlockSwitch.IsOn = (bool)adBlockEnable;
             }
-            else //default is "Folder"
+        }
+
+        private void AdBlockSwitch_Toggled(object sender, RoutedEventArgs e)
+        {
+            var roamingSettings = ApplicationData.Current.RoamingSettings;
+            roamingSettings.Values["AdBlockEnableBool"] = AdBlockSwitch.IsOn;
+        }
+
+        private void SortModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            var roamingSettings = ApplicationData.Current.RoamingSettings;
+            roamingSettings.Values["SortModeString"] = SortModeComboBox.SelectedItem as string;
+        }
+
+        private async void LogoutButton_Click(object sender, RoutedEventArgs e)
+        {
+            try
             {
-                radioButton1.IsChecked = true;
+                HttpClient httpClient = new HttpClient();
+                HttpResponseMessage response = await httpClient.GetAsync(new Uri(logoutURL));
+                if (response.IsSuccessStatusCode)
+                {
+                    await new MessageDialog("Prease restart app", "Logout").ShowAsync();
+                    var roamingSettings = ApplicationData.Current.RoamingSettings;
+                    // Delete a simple setting
+                    roamingSettings.Values.Remove("ApiKeyString");
+                }
             }
-
+            catch (Exception ex)
+            {
+                await new MessageDialog(ex.ToString(), "Error @ Logout").ShowAsync();
+            }
         }
-
-        private void Button_Click(object sender, RoutedEventArgs e)
-        {
-            this.account["UserName"] = this.usernameTextBox.Text;
-            this.account["Password"] = this.passwordBox.Password;
-            this.account.Save();
-
-            this.sort["Sort"] = sortMode;
-            this.sort.Save();
-
-            NavigationService.Navigate(new Uri("/MainPage.xaml", UriKind.Relative));
-        }
-
-        // https://social.msdn.microsoft.com/Forums/ja-JP/757efbc7-117a-4ffd-b572-e2c36ef81ef4/textblock?forum=wp7devtoolja
-        private void radioButton_Checked(object sender, RoutedEventArgs e)
-        {
-            RadioButton radioButton = (RadioButton)sender;
-            sortMode = (string)radioButton.Content;
-        }
-
     }
 }

@@ -1,19 +1,19 @@
-﻿using System.Collections.Generic;
-using System.Net;
-using System.Windows;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
+﻿using System;
+using System.Collections.Generic;
+using Windows.ApplicationModel;
+using Windows.ApplicationModel.Activation;
+using Windows.UI.Core;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Navigation;
 
 namespace FeedLadder
 {
-    public partial class App : Application
+    /// <summary>
+    /// 既定の Application クラスを補完するアプリケーション固有の動作を提供します。
+    /// </summary>
+    sealed partial class Application : Windows.UI.Xaml.Application
     {
-
-        // enable cookie
-        //public CustomWebClient CWClient { get; set; }
-        public CookieContainer GlobalCookieContainer { get; set; }
-
         // unread subscription list
         //public List<SubscriptionItem> SubscriptionList { get; set; }
         public List<Group<SubscriptionItem>> SubscriptionList { get; set; }
@@ -21,133 +21,114 @@ namespace FeedLadder
         public int ItemIndex;
 
         /// <summary>
-        /// Phone アプリケーションのルート フレームへの容易なアクセスを提供します。
+        /// 単一アプリケーション オブジェクトを初期化します。これは、実行される作成したコードの
+        ///最初の行であるため、main() または WinMain() と論理的に等価です。
         /// </summary>
-        /// <returns>Phone アプリケーションのルート フレームです。</returns>
-        public PhoneApplicationFrame RootFrame { get; private set; }
-
-        /// <summary>
-        /// Application オブジェクトのコンストラクターです。
-        /// </summary>
-        public App()
+        public Application()
         {
-            // キャッチできない例外のグローバル ハンドラーです。 
-            UnhandledException += Application_UnhandledException;
+            this.InitializeComponent();
+            this.Suspending += OnSuspending;
 
-            // Silverlight の標準初期化
-            InitializeComponent();
-
-            // Phone 固有の初期化
-            InitializePhoneApplication();
-
-            // デバッグ中にグラフィックスのプロファイル情報を表示します。
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                // 現在のフレーム レート カウンターを表示します。
-                Application.Current.Host.Settings.EnableFrameRateCounter = true;
-
-                // 各フレームで再描画されているアプリケーションの領域を表示します。
-                //Application.Current.Host.Settings.EnableRedrawRegions = true;
-
-                // 試験的な分析視覚化モードを有効にします。 
-                // これにより、色付きのオーバーレイを使用して、GPU に渡されるページの領域が表示されます。
-                //Application.Current.Host.Settings.EnableCacheVisualization = true;
-
-                // アプリケーションの PhoneApplicationService オブジェクトの UserIdleDetectionMode プロパティを Disabled に設定して、
-                // アプリケーションのアイドル状態の検出を無効にします。
-                // 注意: これはデバッグ モードのみで使用してください。ユーザーが電話を使用していないときに、ユーザーのアイドル状態の検出を無効にする
-                // アプリケーションが引き続き実行され、バッテリ電源が消耗します。
-                PhoneApplicationService.Current.UserIdleDetectionMode = IdleDetectionMode.Disabled;
-            }
-
-            RootFrame.Language = System.Windows.Markup.XmlLanguage.GetLanguage(System.Globalization.CultureInfo.CurrentUICulture.Name);
-
-            GlobalCookieContainer = new CookieContainer();
-
+            // initialize
             SubscriptionList = new List<Group<SubscriptionItem>>();
             GroupIndex = -1;
             ItemIndex = -1;
-
         }
 
-        // (たとえば、[スタート] メニューから) アプリケーションが起動するときに実行されるコード
-        // このコードは、アプリケーションが再アクティブ化済みの場合には実行されません
-        private void Application_Launching(object sender, LaunchingEventArgs e)
+        /// <summary>
+        /// アプリケーションがエンド ユーザーによって正常に起動されたときに呼び出されます。他のエントリ ポイントは、
+        /// アプリケーションが特定のファイルを開くために起動されたときなどに使用されます。
+        /// </summary>
+        /// <param name="e">起動の要求とプロセスの詳細を表示します。</param>
+        protected override void OnLaunched(LaunchActivatedEventArgs e)
         {
-        }
 
-        // アプリケーションがアクティブになった (前面に表示された) ときに実行されるコード
-        // このコードは、アプリケーションの初回起動時には実行されません
-        private void Application_Activated(object sender, ActivatedEventArgs e)
-        {
-        }
-
-        // アプリケーションが非アクティブになった (バックグラウンドに送信された) ときに実行されるコード
-        // このコードは、アプリケーションの終了時には実行されません
-        private void Application_Deactivated(object sender, DeactivatedEventArgs e)
-        {
-        }
-
-        // (たとえば、ユーザーが戻るボタンを押して) アプリケーションが終了するときに実行されるコード
-        // このコードは、アプリケーションが非アクティブになっているときには実行されません
-        private void Application_Closing(object sender, ClosingEventArgs e)
-        {
-        }
-
-        // ナビゲーションに失敗した場合に実行されるコード
-        private void RootFrame_NavigationFailed(object sender, NavigationFailedEventArgs e)
-        {
+#if DEBUG
             if (System.Diagnostics.Debugger.IsAttached)
             {
-                // ナビゲーションに失敗しました。デバッガーで中断します。
-                System.Diagnostics.Debugger.Break();
+                this.DebugSettings.EnableFrameRateCounter = false;
+            }
+#endif
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // ウィンドウに既にコンテンツが表示されている場合は、アプリケーションの初期化を繰り返さずに、
+            // ウィンドウがアクティブであることだけを確認してください
+            if (rootFrame == null)
+            {
+                // ナビゲーション コンテキストとして動作するフレームを作成し、最初のページに移動します
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                if (e.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    //TODO: 以前中断したアプリケーションから状態を読み込みます
+                }
+
+                // フレームを現在のウィンドウに配置します
+                Window.Current.Content = rootFrame;
+            }
+
+            if (rootFrame.Content == null)
+            {
+                // ナビゲーション スタックが復元されない場合は、最初のページに移動します。
+                // このとき、必要な情報をナビゲーション パラメーターとして渡して、新しいページを
+                //構成します
+                rootFrame.Navigate(typeof(MainPage), e.Arguments);
+            }
+            // 現在のウィンドウがアクティブであることを確認します
+            Window.Current.Activate();
+
+            SystemNavigationManager.GetForCurrentView().BackRequested += App_BackRequested;
+
+            rootFrame.Navigated += RootFrame_Navigated;
+        }
+
+        private void RootFrame_Navigated(object sender, NavigationEventArgs e)
+        {
+            Frame rootFrame = Window.Current.Content as Frame;
+            SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
+        }
+
+        private void App_BackRequested(object sender, BackRequestedEventArgs e)
+        {
+            // Check that no one has already handled this
+            if (!e.Handled)
+            {
+                // Default is to navigate back within the Frame
+                Frame frame = Window.Current.Content as Frame;
+                if (frame.CanGoBack)
+                {
+                    frame.GoBack();
+                    // Signal handled so the system doesn't navigate back through the app stack
+                    e.Handled = true;
+                }
             }
         }
 
-        // ハンドルされない例外の発生時に実行されるコード
-        private void Application_UnhandledException(object sender, ApplicationUnhandledExceptionEventArgs e)
+        /// <summary>
+        /// 特定のページへの移動が失敗したときに呼び出されます
+        /// </summary>
+        /// <param name="sender">移動に失敗したフレーム</param>
+        /// <param name="e">ナビゲーション エラーの詳細</param>
+        void OnNavigationFailed(object sender, NavigationFailedEventArgs e)
         {
-            if (System.Diagnostics.Debugger.IsAttached)
-            {
-                // ハンドルされない例外が発生しました。デバッガーで中断します。
-                System.Diagnostics.Debugger.Break();
-            }
+            throw new Exception("Failed to load Page " + e.SourcePageType.FullName);
         }
 
-        #region Phone アプリケーションの初期化
-
-        // 初期化の重複を回避します
-        private bool phoneApplicationInitialized = false;
-
-        // このメソッドに新たなコードを追加しないでください
-        private void InitializePhoneApplication()
+        /// <summary>
+        /// アプリケーションの実行が中断されたときに呼び出されます。
+        /// アプリケーションが終了されるか、メモリの内容がそのままで再開されるかに
+        /// かかわらず、アプリケーションの状態が保存されます。
+        /// </summary>
+        /// <param name="sender">中断要求の送信元。</param>
+        /// <param name="e">中断要求の詳細。</param>
+        private void OnSuspending(object sender, SuspendingEventArgs e)
         {
-            if (phoneApplicationInitialized)
-                return;
-
-            // フレームを作成しますが、まだ RootVisual に設定しないでください。これによって、アプリケーションがレンダリングできる状態になるまで、
-            // スプラッシュ スクリーンをアクティブなままにすることができます。
-            RootFrame = new PhoneApplicationFrame();
-            RootFrame.Navigated += CompleteInitializePhoneApplication;
-
-            // ナビゲーション エラーを処理します
-            RootFrame.NavigationFailed += RootFrame_NavigationFailed;
-
-            // 再初期化しないようにします
-            phoneApplicationInitialized = true;
+            var deferral = e.SuspendingOperation.GetDeferral();
+            //TODO: アプリケーションの状態を保存してバックグラウンドの動作があれば停止します
+            deferral.Complete();
         }
-
-        // このメソッドに新たなコードを追加しないでください
-        private void CompleteInitializePhoneApplication(object sender, NavigationEventArgs e)
-        {
-            // ルート visual を設定してアプリケーションをレンダリングできるようにします
-            if (RootVisual != RootFrame)
-                RootVisual = RootFrame;
-
-            // このハンドラーは必要なくなったため、削除します
-            RootFrame.Navigated -= CompleteInitializePhoneApplication;
-        }
-
-        #endregion
     }
 }

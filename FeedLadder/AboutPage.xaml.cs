@@ -1,43 +1,25 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Net;
-using System.Windows;
-using System.Windows.Controls;
-using System.Windows.Navigation;
-using Microsoft.Phone.Controls;
-using Microsoft.Phone.Shell;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+
+// 空白ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234238 を参照してください
 
 namespace FeedLadder
 {
-    public partial class AboutPage : PhoneApplicationPage
+    /// <summary>
+    /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
+    /// </summary>
+    public sealed partial class AboutPage : Page
     {
         public AboutPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
-        private void Button_Click(object sender, RoutedEventArgs e)
+        private async void RateButton_Click(object sender, RoutedEventArgs e)
         {
-            // Launch review
-            LaunchReview();
-        }
-
-        // Launch the URI
-        async void LaunchReview()
-        {
-            // Launch the URI
-            string appid = "8e3f11ec-9950-4ddc-8586-bcb8d9347a50";
-            var success = await Windows.System.Launcher.LaunchUriAsync(new Uri("zune:reviewapp?appid=app" + appid));
-
-            if (success)
-            {
-                // URI launched
-            }
-            else
-            {
-                // URI launch failed
-            }
+            var uriReview = new Uri(@"ms-windows-store://review/?ProductId=9nblgggzk2xs");
+            var success = await Windows.System.Launcher.LaunchUriAsync(uriReview);
         }
     }
 }

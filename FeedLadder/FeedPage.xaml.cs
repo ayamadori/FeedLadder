@@ -1,17 +1,29 @@
 ﻿using System;
-using System.Net;
-using System.Windows;
-using Microsoft.Phone.Controls;
-using System.Runtime.Serialization.Json;
-using Microsoft.Phone.Tasks;
-using System.Text;
+using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
+using System.Net;
+using System.Runtime.Serialization.Json;
+using System.Text;
+using Windows.Storage;
+using Windows.System;
+using Windows.UI.Popups;
+using Windows.UI.Xaml;
+using Windows.UI.Xaml.Controls;
+using Windows.UI.Xaml.Input;
+using Windows.UI.Xaml.Navigation;
+using Windows.Web.Http;
+
+// 空白ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234238 を参照してください
 
 namespace FeedLadder
 {
-    public partial class FeedPage : PhoneApplicationPage
+    /// <summary>
+    /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
+    /// </summary>
+    public sealed partial class FeedPage : Page
     {
-        private const string domain = "http://reader.livedoor.com";
+        private const string domainURL = "http://reader.livedwango.com";
         private string subscribeID;
         private string title;
         private string apiKey;
@@ -23,26 +35,21 @@ namespace FeedLadder
 
         public FeedPage()
         {
-            InitializeComponent();
+            this.InitializeComponent();
         }
 
-        protected override void OnNavigatedTo(System.Windows.Navigation.NavigationEventArgs e)
+        protected override void OnNavigatedTo(NavigationEventArgs e)
         {
             base.OnNavigatedTo(e);
 
-            if (e.NavigationMode == System.Windows.Navigation.NavigationMode.New)
+            if (e.NavigationMode == NavigationMode.New)
             {
-                //NavigationContext.QueryString.TryGetValue("subscribe_id", out subscribeID);
-                //NavigationContext.QueryString.TryGetValue("title", out title);
-                //NavigationContext.QueryString.TryGetValue("ApiKey", out apiKey);
-
-                NavigationContext.QueryString.TryGetValue("ApiKey", out apiKey);
-                //PageTitle.Text = title;
-                int group = (App.Current as App).GroupIndex;
-                int item = (App.Current as App).ItemIndex;
-                title = (App.Current as App).SubscriptionList[group][item].Title;
+                apiKey = e.Parameter as string;
+                int group = (Windows.UI.Xaml.Application.Current as Application).GroupIndex;
+                int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
+                title = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].Title;
                 PageTitle.Text = title;
-                subscribeID = (App.Current as App).SubscriptionList[group][item].SubscribeID;
+                subscribeID = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].SubscribeID;
                 Unread(subscribeID);
 
                 // Update timestamp
@@ -52,60 +59,47 @@ namespace FeedLadder
             }
         }
 
-        void ContentPanel_ManipulationCompleted(object sender, System.Windows.Input.ManipulationCompletedEventArgs e)
+        void ContentPanel_ManipulationCompleted(object sender, ManipulationCompletedRoutedEventArgs e)
         {
-            double deltaX = e.TotalManipulation.Translation.X;
-            double deltaY = e.TotalManipulation.Translation.Y;
+            double deltaX = e.Cumulative.Translation.X;
+            double deltaY = e.Cumulative.Translation.Y;
             if (Math.Abs(deltaX) > Math.Abs(deltaY))
             {
-                if (deltaX > delta) // flick right
+                if (deltaX > delta) // flick to right
                 {
                     //MessageBox.Show("Flick to Right: " + deltaX);
                     NoItemLabel.Visibility = Visibility.Collapsed;
-                    goPreviousFeed();
+                    GoPreviousFeed();
                 }
-                else if(deltaX < delta*(-1))// flick left
+                else if (deltaX < delta * (-1))// flick to left
                 {
                     //MessageBox.Show("Flick to Left: " + deltaX);
                     NoItemLabel.Visibility = Visibility.Collapsed;
-                    goNextFeed();
+                    GoNextFeed();
                 }
             }
+            e.Handled = true;
         }
 
         /// <summary>
         /// Unread
         /// </summary>
         /// <param name="subscribe_id">subscribe_id</param>
-        private void Unread(string subscribe_id)
+        private async void Unread(string subscribe_id)
         {
-            CustomWebClient cli = new CustomWebClient();
-            cli.UploadStringCompleted += new UploadStringCompletedEventHandler(cli_UnreadCompleted);
-            cli.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            cli.CookieContainer = (Application.Current as App).GlobalCookieContainer;
-            string postdata = "subscribe_id=" + subscribe_id + "&ApiKey=" + apiKey;
-            cli.UploadStringAsync(new Uri(domain + "/api/unread"), "POST", postdata);
-        }
+            FeedListResult.Visibility = Visibility.Collapsed;
+            ProgressIndicator.IsActive = true;
 
-        void cli_UnreadCompleted(object sender, UploadStringCompletedEventArgs e)
-        {
-            //(Application.Current as App).CWClient.UploadStringCompleted -= (UploadStringCompletedEventHandler)cli_UnreadCompleted;
-
-            ////////////////////////////////////////////////////////////////////////////////////
-            // ② 読み込みデータのを、オブジェクトに変換しUIに渡す処理
-            ////////////////////////////////////////////////////////////////////////////////////
-            //progressBar1.Visibility = Visibility.Collapsed;
-            progressIndicator.IsVisible = false;
-
-            if (e.Error != null)
+            try
             {
-                //MessageBox.Show("通信エラーが発生しました。");
-                MessageBox.Show("Please check network status", "Network Error @ Unread", MessageBoxButton.OK);
-            }
-            else
-            {
-                feedListResult.Visibility = Visibility.Visible;
-                string res = e.Result;
+                HttpClient httpClient = new HttpClient();
+                Dictionary<string, string> postData = new Dictionary<string, string>() { { "subscribe_id", subscribe_id }, { "ApiKey", apiKey } };
+                HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/pin/unread"), new HttpFormUrlEncodedContent(postData));
+
+                FeedListResult.Visibility = Visibility.Visible;
+                ProgressIndicator.IsActive = false;
+
+                string res = await response.Content.ReadAsStringAsync();
 
                 // refer to http://blogs.gine.jp/taka/archives/2106
                 var serializer = new DataContractJsonSerializer(typeof(FeedItems));
@@ -116,26 +110,33 @@ namespace FeedLadder
 
                 // AD feed block (cannnot use "\s" ?)
                 // from http://www.atmarkit.co.jp/fdotnet/dotnettips/815listremove/listremove.html
-                feedItems.Items.RemoveAll(item => System.Text.RegularExpressions.Regex.IsMatch(item.Title, adBlockRegExp));
+                var roamingSettings = ApplicationData.Current.RoamingSettings;
+                object block = roamingSettings.Values["AdBlockEnableBool"];
+                if (block != null && (bool)block) // Default is no blocking
+                    feedItems.Items.RemoveAll(item => System.Text.RegularExpressions.Regex.IsMatch(item.Title, adBlockRegExp));
 
                 //Format item         
                 foreach (FeedItem item in feedItems.Items)
                 {
                     // trim (=remove \s or \n or zenkaku space from start and end) from title string
                     item.Title = item.Title.Trim(' ', '\u3000', '\n');
-                    item.Title = HttpUtility.HtmlDecode(item.Title);
-                    item.Link = HttpUtility.HtmlDecode(item.Link);
+                    item.Title = WebUtility.HtmlDecode(item.Title);
+                    item.Link = WebUtility.HtmlDecode(item.Link);
                 }
-                this.feedListResult.ItemsSource = feedItems.Items;
+                FeedListResult.ItemsSource = feedItems.Items;
 
                 if (feedItems.Items.Count == 0)
                 {
-                    feedListResult.Visibility = Visibility.Collapsed;
+                    FeedListResult.Visibility = Visibility.Collapsed;
                     NoItemLabel.Visibility = Visibility.Visible;
                 }
 
                 //// Set as read
                 //Touch(subscribeID, timeStamp);
+            }
+            catch (Exception ex)
+            {
+                await new MessageDialog("Error @ Unread").ShowAsync();
             }
         }
 
@@ -145,14 +146,19 @@ namespace FeedLadder
         /// </summary>
         /// <param name="subscribe_id">subscribe_id</param>
         /// <param name="timestamp">timestamp</param>
-        private void Touch(string subscribe_id, long timestamp)
+        private async void Touch(string subscribe_id, long timestamp)
         {
-            CustomWebClient cli = new CustomWebClient();
-            cli.UploadStringCompleted += new UploadStringCompletedEventHandler(cli_TouchCompleted);
-            cli.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            cli.CookieContainer = (Application.Current as App).GlobalCookieContainer;
-            string postdata = "subscribe_id=" + subscribe_id + "&timestamp=" + timestamp + "&ApiKey=" + apiKey;
-            cli.UploadStringAsync(new Uri(domain + "/api/touch"), "POST", postdata);
+            try
+            {
+                HttpClient httpClient = new HttpClient();
+                Dictionary<string, string> postData = new Dictionary<string, string>() { { "subscribe_id", subscribe_id }, { "timestamp", timestamp.ToString() }, { "ApiKey", apiKey } };
+                HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/touch"), new HttpFormUrlEncodedContent(postData));
+                ProgressIndicator.IsActive = false;
+            }
+            catch (Exception ex)
+            {
+                await new MessageDialog("Error @ Touch").ShowAsync();
+            }
         }
 
         /// <summary>
@@ -161,24 +167,18 @@ namespace FeedLadder
         /// </summary>
         /// <param name="subscribe_id">subscribe_id</param>
         /// <param name="timestamp">timestamp</param>
-        private void TouchAll(string subscribe_id)
+        private async void TouchAll(string subscribe_id)
         {
-            CustomWebClient cli = new CustomWebClient();
-            cli.UploadStringCompleted += new UploadStringCompletedEventHandler(cli_TouchCompleted);
-            cli.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            cli.CookieContainer = (Application.Current as App).GlobalCookieContainer;
-            string postdata = "subscribe_id=" + subscribe_id + "&ApiKey=" + apiKey;
-            cli.UploadStringAsync(new Uri(domain + "/api/touch"), "POST", postdata);
-        }
-
-        void cli_TouchCompleted(object sender, UploadStringCompletedEventArgs e)
-        {
-            progressIndicator.IsVisible = false;
-
-            if (e.Error != null)
+            try
             {
-                //MessageBox.Show("通信エラーが発生しました。");
-                MessageBox.Show("Please check network status", "Network Error @ Touch", MessageBoxButton.OK);
+                HttpClient httpClient = new HttpClient();
+                Dictionary<string, string> postData = new Dictionary<string, string>() { { "subscribe_id", subscribe_id }, { "ApiKey", apiKey } };
+                HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/touch"), new HttpFormUrlEncodedContent(postData));
+                ProgressIndicator.IsActive = false;
+            }
+            catch (Exception ex)
+            {
+                await new MessageDialog("Error @ TouchAll").ShowAsync();
             }
         }
 
@@ -188,24 +188,18 @@ namespace FeedLadder
         /// </summary>
         /// <param name="link">link</param>
         /// <param name="title">title</param>
-        private void PinAdd(string link, string title)
+        private async void PinAdd(string link, string title)
         {
-            CustomWebClient cli = new CustomWebClient();
-            cli.UploadStringCompleted += new UploadStringCompletedEventHandler(cli_PinAddCompleted);
-            cli.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            cli.CookieContainer = (Application.Current as App).GlobalCookieContainer;
-            string postdata = "link=" + HttpUtility.UrlEncode(link) + "&title=" + HttpUtility.UrlEncode(title) + "&ApiKey=" + apiKey;
-            cli.UploadStringAsync(new Uri(domain + "/api/pin/add"), "POST", postdata);
-        }
-
-        void cli_PinAddCompleted(object sender, UploadStringCompletedEventArgs e)
-        {
-            progressIndicator.IsVisible = false;
-
-            if (e.Error != null)
+            try
             {
-                //MessageBox.Show("通信エラーが発生しました。");
-                //MessageBox.Show("Please check network status", "Network Error @ PinAdd", MessageBoxButton.OK);
+                HttpClient httpClient = new HttpClient();
+                Dictionary<string, string> postData = new Dictionary<string, string>() { { "link", link }, { "title", title }, { "ApiKey", apiKey } };
+                HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/pin/add"), new HttpFormUrlEncodedContent(postData));
+                ProgressIndicator.IsActive = false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error @ PinAdd: " + ex.ToString());
             }
         }
 
@@ -214,78 +208,68 @@ namespace FeedLadder
         /// from http://d.hatena.ne.jp/zuzu_sion/20091011/1255337739
         /// </summary>
         /// <param name="link">link</param>
-        private void PinRemove(string link)
+        private async void PinRemove(string link)
         {
-            CustomWebClient cli = new CustomWebClient();
-            cli.UploadStringCompleted += new UploadStringCompletedEventHandler(cli_PinRemoveCompleted);
-            cli.Headers[HttpRequestHeader.ContentType] = "application/x-www-form-urlencoded";
-            cli.CookieContainer = (Application.Current as App).GlobalCookieContainer;
-            string postdata = "link=" + HttpUtility.UrlEncode(link) + "&ApiKey=" + apiKey;
-            cli.UploadStringAsync(new Uri(domain + "/api/pin/remove"), "POST", postdata);
-        }
-
-        void cli_PinRemoveCompleted(object sender, UploadStringCompletedEventArgs e)
-        {
-            progressIndicator.IsVisible = false;
-
-            if (e.Error != null)
+            try
             {
-                //MessageBox.Show("通信エラーが発生しました。");
-                //MessageBox.Show("Please check network status", "Network Error @ PinRemove", MessageBoxButton.OK);
+                HttpClient httpClient = new HttpClient();
+                Dictionary<string, string> postData = new Dictionary<string, string>() { { "link", link }, { "ApiKey", apiKey } };
+                HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/pin/remove"), new HttpFormUrlEncodedContent(postData));
+                ProgressIndicator.IsActive = false;
+            }
+            catch (Exception ex)
+            {
+                Debug.WriteLine("Error @ PinRemove: " + ex.ToString());
             }
         }
 
         // Open item in browser
-        private void ShowInBrowser(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void ShowInBrowser(object sender)
         {
-            FeedItem item = (FeedItem)((sender as LongListSelector).SelectedItem);
+            FeedItem item = (FeedItem)((sender as Grid).DataContext); // At right-click, the item is not selected in ListView
             if (item != null)
             {
-                WebBrowserTask task = new WebBrowserTask();
-                task.Uri = new Uri(item.Link);
-                task.Show();
+                bool success = await Launcher.LaunchUriAsync(new Uri(item.Link));
             }
         }
 
-        private void showEntry(object sender, System.Windows.Input.GestureEventArgs e)
+        private async void ShowEntry(object sender)
         {
-            FeedItem item = (FeedItem)((sender as LongListSelector).SelectedItem);
+            FeedItem item = (FeedItem)((sender as ListView).SelectedItem);
             if (item != null)
             {
-                if (String.IsNullOrEmpty(item.Body) == false)
+                if (string.IsNullOrEmpty(item.Body) == false)
                 {
-                    String navigateUri = "/EntryPage.xaml?title=" + HttpUtility.UrlEncode(item.Title) + "&link=" + HttpUtility.UrlEncode(item.Link) + "&body=" + HttpUtility.UrlEncode(item.Body);
-                    Console.WriteLine("URI length = " + navigateUri.Length);
-                    NavigationService.Navigate(new Uri(navigateUri, UriKind.Relative));
-                    //NavigationService.Navigate(new Uri("/EntryPage.xaml?title=" + HttpUtility.UrlEncode(item.Title) + "&link=" + HttpUtility.UrlEncode(item.Link) + "&body=" + HttpUtility.UrlEncode(item.Body), UriKind.Relative));
-                    //NavigationService.Navigate(new Uri("/EntryPage.xaml?title=" + item.Title + "&link=" + item.Link + "&body=" + item.Body, UriKind.Relative));
-                    //NavigationService.Navigate(new Uri("/EntryPage.xaml?title=" + item.Title + "&link=" + item.Link + "&body=" + HttpUtility.UrlEncode(item.Body), UriKind.Relative));
+                    Frame.Navigate(typeof(EntryPage), item);
                 }
                 else // if body is null/empty, open browser directly
                 {
-                    WebBrowserTask task = new WebBrowserTask();
-                    task.Uri = new Uri(item.Link);
-                    task.Show();
+                    bool success = await Launcher.LaunchUriAsync(new Uri(item.Link));
                 }
             }
         }
 
-        private void feedListResult_Tap(object sender, System.Windows.Input.GestureEventArgs e)
+        private void FeedListResult_Tapped(object sender, TappedRoutedEventArgs e)
         {
             if (!pressedPin)
             {
-                showEntry(sender, e);
+                ShowEntry(sender);
+                sender = null;
             }
             pressedPin = false;
+            e.Handled = true;
         }
 
-        private void feedListResult_Hold(object sender, System.Windows.Input.GestureEventArgs e)
+        // At right-click, the item is not selected in ListView
+        private void FeedItemTemplate_RightTapped(object sender, RightTappedRoutedEventArgs e)
         {
             if (!pressedPin)
             {
-                ShowInBrowser(sender, e);
+                ShowInBrowser(sender);
+                sender = null;
             }
             pressedPin = false;
+            e.Handled = true;
         }
 
         private void PinButton_Click(object sender, RoutedEventArgs e)
@@ -293,9 +277,9 @@ namespace FeedLadder
             pressedPin = true;
         }
 
-        private void goNextFeed()
+        private void GoNextFeed()
         {
-            progressIndicator.IsVisible = true;
+            ProgressIndicator.IsActive = true;
 
             // Add pin
             foreach (FeedItem temp in feedItems.Items)
@@ -305,29 +289,30 @@ namespace FeedLadder
             }
 
             // Mark this feed as read
-            int group = (App.Current as App).GroupIndex;
-            int item = (App.Current as App).ItemIndex;
+            int group = (Application.Current as Application).GroupIndex;
+            int item = (Application.Current as Application).ItemIndex;
             //(App.Current as App).SubscriptionList[group][item].UnreadCount = null;
-            (App.Current as App).SubscriptionList[group][item].isRead = true;
+            (Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
             //if(itemIndex > (App.Current as App).SubscriptionList.Count - 2)
-            if (item > (App.Current as App).SubscriptionList[group].Count - 2)
+            if (item > (Application.Current as Application).SubscriptionList[group].Count - 2)
             {
-                NavigationService.GoBack();
+                if (Frame.CanGoBack)
+                    Frame.GoBack();
             }
             //else if (itemIndex > -1)
             else
             {
-                feedListResult.Visibility = Visibility.Collapsed;
+                FeedListResult.Visibility = Visibility.Collapsed;
 
                 // Go next feed
                 //SubscriptionItem next = (App.Current as App).SubscriptionList[itemIndex + 1];
-                SubscriptionItem next = (App.Current as App).SubscriptionList[group][item + 1];
+                SubscriptionItem next = (Application.Current as Application).SubscriptionList[group][item + 1];
                 PageTitle.Text = next.Title;
                 subscribeID = next.SubscribeID;
                 Unread(subscribeID);
-                (App.Current as App).ItemIndex = item + 1;
+                (Application.Current as Application).ItemIndex = item + 1;
 
                 // Update timestamp
                 DateTime utcNow = DateTime.UtcNow;
@@ -335,9 +320,9 @@ namespace FeedLadder
             }
         }
 
-        private void goPreviousFeed()
+        private void GoPreviousFeed()
         {
-            progressIndicator.IsVisible = true;
+            ProgressIndicator.IsActive = true;
 
             // Add pin
             foreach (FeedItem temp in feedItems.Items)
@@ -347,31 +332,49 @@ namespace FeedLadder
             }
 
             // Mark this feed as read
-            int group = (App.Current as App).GroupIndex;
-            int item = (App.Current as App).ItemIndex;
+            int group = (Application.Current as Application).GroupIndex;
+            int item = (Application.Current as Application).ItemIndex;
             //(App.Current as App).SubscriptionList[group][item].UnreadCount = null;
-            (App.Current as App).SubscriptionList[group][item].isRead = true;
+            (Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
             if (item == 0)
             {
-                NavigationService.GoBack();
+                if (Frame.CanGoBack)
+                    Frame.GoBack();
             }
             else
             {
-                feedListResult.Visibility = Visibility.Collapsed;
+                FeedListResult.Visibility = Visibility.Collapsed;
 
                 // Go previous feed
-                SubscriptionItem prev = (App.Current as App).SubscriptionList[group][item - 1];
+                SubscriptionItem prev = (Application.Current as Application).SubscriptionList[group][item - 1];
                 PageTitle.Text = prev.Title;
                 subscribeID = prev.SubscribeID;
                 Unread(subscribeID);
-                (App.Current as App).ItemIndex = item - 1;
+                (Application.Current as Application).ItemIndex = item - 1;
 
                 // Update timestamp
                 DateTime utcNow = DateTime.UtcNow;
                 timeStamp = UnixEpochTime.GetUnixTime(utcNow) + (60 * 60 * 9);
             }
+        }
+
+        private void PrevButton_Click(object sender, RoutedEventArgs e)
+        {
+            NoItemLabel.Visibility = Visibility.Collapsed;
+            GoPreviousFeed();
+        }
+
+        private void NextButton_Click(object sender, RoutedEventArgs e)
+        {
+            NoItemLabel.Visibility = Visibility.Collapsed;
+            GoNextFeed();
+        }
+
+        private void RootPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+
         }
     }
 }

@@ -1,54 +1,41 @@
-﻿<phone:PhoneApplicationPage
+﻿<Page
+    x:Class="FeedLadder.EntryPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-    xmlns:phone="clr-namespace:Microsoft.Phone.Controls;assembly=Microsoft.Phone"
-    xmlns:shell="clr-namespace:Microsoft.Phone.Shell;assembly=Microsoft.Phone"
+    xmlns:local="using:FeedLadder"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-    xmlns:local="clr-namespace:FeedLadder" 
-    x:Class="FeedLadder.EntryPage"
-    mc:Ignorable="d" d:DesignWidth="480" d:DesignHeight="768"
-    FontFamily="{StaticResource PhoneFontFamilyNormal}"
-    FontSize="{StaticResource PhoneFontSizeMediumLarge}" 
-    SupportedOrientations="Portrait" Orientation="Portrait"
-    shell:SystemTray.IsVisible="True"
-    Language="ja-JP">
+    mc:Ignorable="d"
+    NavigationCacheMode="Enabled"
+    RequestedTheme="Light">
     
-	<phone:PhoneApplicationPage.ApplicationBar>
-		<shell:ApplicationBar>
-			<shell:ApplicationBarIconButton x:Name="abmOpen" IconUri="/Assets/AppBar/InternetExplorer.png" Text="open" Click="abmOpen_Click"/>
-			<!--<shell:ApplicationBarIconButton x:Name="abmPin" IconUri="/Assets/AppBar/favs.addto.png" Text="pin" Click="abmPin_Click"/>-->
-			<shell:ApplicationBarIconButton x:Name="abmShare" IconUri="/Assets/AppBar/share.png" Text="share" Click="abmShare_Click"/>
-		</shell:ApplicationBar>
-	</phone:PhoneApplicationPage.ApplicationBar>
+    <Page.BottomAppBar>
+        <CommandBar>
+            <CommandBar.Content>
+                <Grid/>
+            </CommandBar.Content>
+            <AppBarButton x:Name="OpenBrowserButton" Icon="Globe" Label="open" Click="OpenBrowserButton_Click"/>
+            <AppBarButton x:Name="ShareButton" Icon="ReShare" Label="share" Click="ShareButton_Click"/>
+        </CommandBar>
+    </Page.BottomAppBar>
 
-    <shell:SystemTray.ProgressIndicator>
-        <shell:ProgressIndicator x:Name="progressIndicator" IsIndeterminate="True" IsVisible="True" Text="Loading..." />
-    </shell:SystemTray.ProgressIndicator>
-
-    <!--LayoutRoot は、すべてのページ コンテンツが配置されるルート グリッドです-->
-    <Grid x:Name="LayoutRoot" Background="Transparent">
+    <Grid x:Name="LayoutRoot" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
         </Grid.RowDefinitions>
 
-        <!--TitlePanel は、アプリケーション名とページ タイトルを格納します-->
-        <!--<StackPanel Grid.Row="0" Margin="12,17,0,28">
-            <TextBlock Text="FEEDLADDER" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock x:Name="PageTitle" Margin="9,-7,0,0" Style="{StaticResource PhoneTextTitle1Style}" Text="hogehoge"/>
-        </StackPanel>-->
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,17,0,0">
-            <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource PhoneTextNormalStyle}"/>
-            <TextBlock x:Name="PageTitle" Text="hogehoge" Margin="9,0,0,0" Style="{StaticResource PhoneTextTitle1Style}" FontSize="56"/>
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,16,0,0">
+            <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource BaseTextBlockStyle}" FontWeight="Bold"/>
+            <TextBlock x:Name="PageTitle" Text="EntryPageTitle" Margin="0,16,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
         </StackPanel>
 
         <!--ContentPanel - 追加コンテンツをここに入力します-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,0,12,0">
-            <TextBlock x:Name="NoBodyLabel" TextWrapping="Wrap" Text="No Body" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource PhoneTextLargeStyle}" />
-            <phone:WebBrowser x:Name="BrowserComponent" Opacity="0" LoadCompleted="BrowserComponent_LoadCompleted" Navigating="BrowserComponent_Navigating" Visibility="Collapsed"/>
-            <!--<Rectangle x:Name="BrowserMask" Fill="{StaticResource PhoneBackgroundBrush}" StrokeThickness="0"/>-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0">
+            <TextBlock x:Name="NoBodyLabel" TextWrapping="Wrap" Text="No Body" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
+            <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
+            <WebView x:Name="BrowserComponent" Opacity="0" LoadCompleted="BrowserComponent_LoadCompleted" NavigationStarting="BrowserComponent_NavigationStarting" Visibility="Collapsed"/>
         </Grid>
+        <TextBlock x:Name="testblock"/>
     </Grid>
-
-</phone:PhoneApplicationPage>
+</Page>
