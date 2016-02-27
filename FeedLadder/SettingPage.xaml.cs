@@ -6,6 +6,7 @@ using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
+using Windows.Web.Http.Filters;
 
 // 空白ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234238 を参照してください
 
@@ -16,7 +17,8 @@ namespace FeedLadder
     /// </summary>
     public sealed partial class SettingPage : Page
     {
-        private const string logoutURL = "http://reader.livedwango.com/reader/logout";
+        private const string domainURL = "http://reader.livedwango.com";
+        private const string logoutURL = "http://member.livedoor.com/login/logout";
 
         public SettingPage()
         {
@@ -49,6 +51,10 @@ namespace FeedLadder
                     AdBlockSwitch.IsOn = false; // Default is no blocking
                 else
                     AdBlockSwitch.IsOn = (bool)adBlockEnable;
+
+                string userName = e.Parameter as string;
+                if (userName == null) userName = "(No login)";
+                UsernameTextBox.Text = userName;
             }
         }
 
@@ -68,19 +74,24 @@ namespace FeedLadder
         {
             try
             {
+                //HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
                 HttpClient httpClient = new HttpClient();
-                HttpResponseMessage response = await httpClient.GetAsync(new Uri(logoutURL));
-                if (response.IsSuccessStatusCode)
+                httpClient.DefaultRequestHeaders.Referer = new Uri(domainURL + "/reader/");
+                HttpResponseMessage response1 = await httpClient.GetAsync(new Uri(domainURL + "/reader/logout"));
+                httpClient.DefaultRequestHeaders.Referer = new Uri("http://www.livedoor.com/");
+                HttpResponseMessage response2 = await httpClient.GetAsync(new Uri(logoutURL));
+                if (response1.IsSuccessStatusCode && response2.IsSuccessStatusCode)
                 {
-                    await new MessageDialog("Prease restart app", "Logout").ShowAsync();
-                    var roamingSettings = ApplicationData.Current.RoamingSettings;
+                    var localSettings = ApplicationData.Current.LocalSettings;
                     // Delete a simple setting
-                    roamingSettings.Values.Remove("ApiKeyString");
+                    localSettings.Values.Remove("ApiKeyString");
+                    UsernameTextBox.Text = "(No login)";
+                    await new MessageDialog("Please restart app.", "Logout").ShowAsync();
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog(ex.ToString(), "Error @ Logout").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ Logout").ShowAsync();
             }
         }
     }

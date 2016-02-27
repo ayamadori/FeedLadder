@@ -19,6 +19,7 @@ namespace FeedLadder
         private string title;
         private string link;
         private string body;
+        private const string guideURL = "http://reader.livedwango.com/contents/guide";
 
         public EntryPage()
         {
@@ -31,7 +32,16 @@ namespace FeedLadder
 
             if (e.NavigationMode == NavigationMode.New)
             {
+                ProgressIndicator.IsActive = true;
                 FeedItem item = e.Parameter as FeedItem;
+                if(item == null)
+                {
+                    title = "Live Dwango Reader Guide";
+                    link = guideURL;
+                    BrowserComponent.Navigate(new Uri(guideURL));
+                    PageTitle.Text = title;
+                    return;
+                }
                 title = item.Title;
                 link = item.Link;
                 body = item.Body;
@@ -91,7 +101,7 @@ namespace FeedLadder
         private async void BrowserComponent_NavigationStarting(WebView sender, WebViewNavigationStartingEventArgs args)
         {
             Uri uri = args.Uri;
-            if (uri != null && uri.AbsoluteUri.StartsWith("http"))
+            if (uri != null && uri.AbsoluteUri.StartsWith("http") && !uri.AbsoluteUri.StartsWith(guideURL))
             {
                 // cancel navigation
                 args.Cancel = true;
@@ -103,16 +113,15 @@ namespace FeedLadder
         private void ShareButton_Click(object sender, RoutedEventArgs e)
         {
             DataTransferManager dataTransferManager = DataTransferManager.GetForCurrentView();
-            dataTransferManager.DataRequested += DataTransferManager_DataRequested;
+            //dataTransferManager.DataRequested += DataTransferManager_DataRequested;
+            dataTransferManager.DataRequested += (s, args) =>
+            {
+                DataRequest request = args.Request;
+                request.Data.Properties.Title = title;
+                request.Data.SetText(title);
+                request.Data.SetWebLink(new Uri(link));
+            };
             DataTransferManager.ShowShareUI();
-        }
-
-        private void DataTransferManager_DataRequested(DataTransferManager sender, DataRequestedEventArgs args)
-        {
-            DataRequest request = args.Request;
-            request.Data.Properties.Title = title;
-            request.Data.SetText(title);
-            request.Data.SetWebLink(new Uri(link));
         }
 
         // Open item in browser

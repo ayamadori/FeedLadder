@@ -5,7 +5,6 @@ using System.IO;
 using System.Net;
 using System.Runtime.Serialization.Json;
 using System.Text;
-using System.Threading.Tasks;
 using Windows.Storage;
 using Windows.System;
 using Windows.UI.Popups;
@@ -28,15 +27,26 @@ namespace FeedLadder
         private const string domainURL = "http://reader.livedwango.com";
         private string apiKey;
         private List<PinItem> pinItems;
+        private string userName;
 
         public MainPage()
         {
             this.InitializeComponent();
         }
 
-        // 画面がロードされてからの処理：RSSデータを非同期で読み込む
         private async void MainPage_Loaded(object sender, RoutedEventArgs e)
         {
+            // Show SubFrame
+            if (SubFrame.Visibility == Visibility.Visible)
+            {
+                SubFrame.Navigate(typeof(FeedPage));
+
+                // Delete backstack
+                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                int count = Frame.BackStack.Count;
+                if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
+            }
+
             RefreshButton.IsEnabled = false;
             if (SubscriptionListResult.Visibility == Visibility.Collapsed)
                 NoItemLabel.Visibility = Visibility.Visible;
@@ -53,22 +63,43 @@ namespace FeedLadder
                 // Set token to cookie
                 HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
                 var cookies = filter.CookieManager.GetCookies(new Uri(domainURL));
-                HttpCookie readerSid = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
-                filter.CookieManager.SetCookie(readerSid);
-                cookies = filter.CookieManager.GetCookies(new Uri(domainURL));
-
-                // Check if can login to LDR
-                HttpClient httpClient = new HttpClient(filter);
-                string temp = await httpClient.GetStringAsync(new Uri(domainURL + "/reader/"));
-                // If can't login,, show login window to user
-                if (temp.Contains("ApiKey"))
+                // If reader_sid==ApiKey, already logged-in
+                foreach (var cookie in cookies)
                 {
-                    apiKey = temp.Substring(temp.IndexOf("ApiKey") + 10, 32);
-                    localSettings.Values["ApiKeyString"] = apiKey;
-                    RefreshButton.IsEnabled = true;
+                    if (cookie.Name.StartsWith("reader_sid"))
+                        if (cookie.Value.StartsWith(apiKey))
+                        {
+                            RefreshButton.IsEnabled = true;
+                            return;
+                        }
                 }
-                else
-                    Login();
+                HttpCookie readerSID = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
+                filter.CookieManager.SetCookie(readerSID);
+
+                try
+                {
+                    // Check if can login to LDR
+                    HttpClient httpClient = new HttpClient(filter);
+                    string responseString = await httpClient.GetStringAsync(new Uri(domainURL + "/reader/"));
+                    // If can't login,, show login window to user
+                    if (responseString.Contains("ApiKey"))
+                    {
+                        apiKey = responseString.Substring(responseString.IndexOf("ApiKey") + 10, 32);
+                        localSettings.Values["ApiKeyString"] = apiKey;
+
+                        int _start = responseString.IndexOf("<a href=\"/user/") + 15;
+                        int _end = responseString.IndexOf("\"", _start);
+                        userName = responseString.Substring(_start, _end - _start);
+
+                        RefreshButton.IsEnabled = true;
+                    }
+                    else
+                        Login();
+                }
+                catch (Exception)
+                {
+                    await new MessageDialog("This app could not send/receive data.", "Error @ Login").ShowAsync();
+                }
             }
         }
 
@@ -76,7 +107,17 @@ namespace FeedLadder
         {
             base.OnNavigatedTo(e);
 
-            if (RootPivot.SelectedIndex == 1) // pinned
+            //if (SubFrame.Visibility == Visibility.Visible)
+            //{
+            //    SubFrame.Navigate(typeof(FeedPage));
+
+            //    // Delete backstack
+            //    // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+            //    int count = Frame.BackStack.Count;
+            //    if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
+            //}
+
+                if (RootPivot.SelectedIndex == 1) // pinned
             {
                 return;
             }
@@ -118,7 +159,7 @@ namespace FeedLadder
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            Frame.Navigate(typeof(SettingPage));
+            Frame.Navigate(typeof(SettingPage), userName);
         }
 
         private void AboutButton_Click(object sender, RoutedEventArgs e)
@@ -159,6 +200,11 @@ namespace FeedLadder
                         apiKey = responseString.Substring(responseString.IndexOf("ApiKey") + 10, 32);
                         var localSettings = ApplicationData.Current.LocalSettings;
                         localSettings.Values["ApiKeyString"] = apiKey;
+
+                        int _start = responseString.IndexOf("<a href=\"/user/") + 15;
+                        int _end = responseString.IndexOf("\"", _start);
+                        userName = responseString.Substring(_start, _end - _start);
+
                         RefreshButton.IsEnabled = true;
                         break;
                     case Windows.Security.Authentication.Web.WebAuthenticationStatus.ErrorHttp:
@@ -171,7 +217,7 @@ namespace FeedLadder
                         break;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
                 // Authentication failed. Handle parameter, SSL/TLS, and Network Unavailable errors here.
                 await new MessageDialog("Authentication failed").ShowAsync();
@@ -190,6 +236,11 @@ namespace FeedLadder
 
             try
             {
+                // (Re-)Set token to cookie
+                HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
+                HttpCookie readerSid = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
+                filter.CookieManager.SetCookie(readerSid);
+
                 HttpClient httpClient = new HttpClient();
                 Dictionary<string, string> postData = new Dictionary<string, string>() { { "ApiKey", apiKey } };
                 HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/subs?unread=" + unread + "&from_id=0&limit=100"), new HttpFormUrlEncodedContent(postData));
@@ -266,9 +317,9 @@ namespace FeedLadder
                 }
                 RefreshButton.IsEnabled = true;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog("Error @ Subs").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ Subs").ShowAsync();
             }
         }
 
@@ -286,7 +337,10 @@ namespace FeedLadder
                     (sender as ListView).SelectedItem = null;
                     (Windows.UI.Xaml.Application.Current as Application).GroupIndex = groupIndex;
                     (Windows.UI.Xaml.Application.Current as Application).ItemIndex = itemIndex;
-                    Frame.Navigate(typeof(FeedPage), apiKey);
+                    if (SubFrame.Visibility == Visibility.Visible)
+                        SubFrame.Navigate(typeof(FeedPage), apiKey);
+                    else
+                        Frame.Navigate(typeof(FeedPage), apiKey);
                 }
             }
         }
@@ -304,6 +358,7 @@ namespace FeedLadder
                 PinAll();
             }
         }
+
 
         private async void PinList_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -363,9 +418,9 @@ namespace FeedLadder
                     PinNoItemLabel.Visibility = Visibility.Visible;
                 }
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog("Error @ PinAll").ShowAsync();
+                await new MessageDialog("This app could not send/receive data." ,"Error @ PinAll").ShowAsync();
             }
         }
 

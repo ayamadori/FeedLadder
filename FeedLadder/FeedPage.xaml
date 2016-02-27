@@ -6,7 +6,8 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     mc:Ignorable="d"
-    NavigationCacheMode="Enabled">
+    NavigationCacheMode="Enabled"
+    Loaded="FeedPage_Loaded">
 
     <Page.Resources>
 
@@ -25,28 +26,48 @@
         </DataTemplate>
 
     </Page.Resources>
-    
-    <Page.BottomAppBar>
-        <CommandBar>
-            <CommandBar.Content>
-                <Grid/>
-            </CommandBar.Content>
-            <AppBarButton x:Name="PrevButton" Icon="Back" Label="prev" Click="PrevButton_Click"/>
-            <AppBarButton x:Name="NextButton" Icon="Forward" Label="next" Click="NextButton_Click"/>
-        </CommandBar>
-    </Page.BottomAppBar>
 
-    <!--LayoutRoot は、すべてのページ コンテンツが配置されるルート グリッドです-->
-    <Grid x:Name="LayoutRoot" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+    <Grid x:Name="RootGrid">
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition/>
+            <ColumnDefinition/>
+        </Grid.ColumnDefinitions>
+
+        <!--http://mikaelkoskinen.net/post/uwp-xaml-responsive-layout-using-grid-and-adaptivetrigger-->
+        <VisualStateManager.VisualStateGroups>
+            <VisualStateGroup x:Name="VisualStateGroup">
+                <VisualState x:Name="VisualStateMin320">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="320" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootGrid.ColumnDefinitions[0].Width" Value="*"/>
+                        <Setter Target="SubFrame.Visibility" Value="Collapsed"/>
+                        <Setter Target="RootGrid.ColumnDefinitions[1].Width" Value="0"/>
+                    </VisualState.Setters>
+                </VisualState>
+                <VisualState x:Name="VisualStateMin720">
+                    <VisualState.StateTriggers>
+                        <AdaptiveTrigger MinWindowWidth="720" />
+                    </VisualState.StateTriggers>
+                    <VisualState.Setters>
+                        <Setter Target="RootGrid.ColumnDefinitions[0].Width" Value="320"/>
+                        <Setter Target="SubFrame.Visibility" Value="Visible"/>
+                        <Setter Target="RootGrid.ColumnDefinitions[1].Width" Value="*"/>
+                    </VisualState.Setters>
+                </VisualState>
+            </VisualStateGroup>
+        </VisualStateManager.VisualStateGroups>
+
+        <!--LayoutRoot は、すべてのページ コンテンツが配置されるルート グリッドです-->
+    <Grid x:Name="LayoutRoot" Grid.Column="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,16,0,0">
-            <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource BaseTextBlockStyle}" FontWeight="Bold"/>
-            <TextBlock x:Name="PageTitle" Text="FeedPageTitle" Margin="0,16,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
-        </StackPanel>
+        <TextBlock x:Name="PageTitle" Text="Feeds" Margin="12,32,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
 
         <!--If ManipulationMode is "System,TranlationX,TranslationY", can't tap item in Mobile...-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0" ManipulationMode="All" ManipulationCompleted="ContentPanel_ManipulationCompleted">
@@ -61,51 +82,15 @@
                 </ListView.ItemContainerStyle>
             </ListView>
         </Grid>
+        <CommandBar Grid.Row="2">
+            <CommandBar.Content>
+                <Grid/>
+            </CommandBar.Content>
+            <AppBarButton x:Name="PrevButton" Icon="Back" Label="prev" Click="PrevButton_Click"/>
+            <AppBarButton x:Name="NextButton" Icon="Forward" Label="next" Click="NextButton_Click"/>
+        </CommandBar>
     </Grid>
-
-    <!--<Pivot x:Name="RootPivot" Title="FEEDLADDER" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
-        <PivotItem x:Name="Item0">
-            <Grid>
-                <TextBlock x:Name="NoItemLabel0" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}"/>
-                <ProgressRing x:Name="ProgressIndicator0" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
-                <ListView x:Name="FeedListResult0" ItemTemplate="{StaticResource FeedItemTemplate}" Tapped="FeedListResult_Tapped" HorizontalAlignment="Stretch">
-                --><!--Stretch ListViewItem http://d.hatena.ne.jp/CoMo/20110421/1303394273--><!--
-                <ListView.ItemContainerStyle>
-                    <Style TargetType="ListViewItem">
-                        <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                    </Style>
-                </ListView.ItemContainerStyle>
-            </ListView>
-            </Grid>
-        </PivotItem>
-        <PivotItem x:Name="Item1">
-            <Grid>
-                <TextBlock x:Name="NoItemLabel1" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}"/>
-                <ProgressRing x:Name="ProgressIndicator1" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
-                <ListView x:Name="FeedListResult1" ItemTemplate="{StaticResource FeedItemTemplate}" Tapped="FeedListResult_Tapped" HorizontalAlignment="Stretch">
-                    --><!--Stretch ListViewItem http://d.hatena.ne.jp/CoMo/20110421/1303394273--><!--
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
-            </Grid>
-        </PivotItem>
-        <PivotItem x:Name="Item2">
-            <Grid>
-                <TextBlock x:Name="NoItemLabel2" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}"/>
-                <ProgressRing x:Name="ProgressIndicator2" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
-                <ListView x:Name="FeedListResult2" ItemTemplate="{StaticResource FeedItemTemplate}" Tapped="FeedListResult_Tapped" HorizontalAlignment="Stretch">
-                    --><!--Stretch ListViewItem http://d.hatena.ne.jp/CoMo/20110421/1303394273--><!--
-                    <ListView.ItemContainerStyle>
-                        <Style TargetType="ListViewItem">
-                            <Setter Property="HorizontalContentAlignment" Value="Stretch" />
-                        </Style>
-                    </ListView.ItemContainerStyle>
-                </ListView>
-            </Grid>
-        </PivotItem>
-    </Pivot>-->
+        <Frame x:Name="SubFrame" Grid.Column="1"/>
+    </Grid>
 
 </Page>

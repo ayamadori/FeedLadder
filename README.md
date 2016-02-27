@@ -24,6 +24,9 @@ GNU GENERAL PUBLIC LICENSE Version 3
 http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Version History
+- Version 2.1.0
+ * Support responsive(?) UI
+
 - Version 2.0.0
  * This version and newer supports Windows 10 only
  * Support to change the service URL

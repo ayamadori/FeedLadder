@@ -47,6 +47,17 @@ namespace FeedLadder
                 apiKey = e.Parameter as string;
                 int group = (Windows.UI.Xaml.Application.Current as Application).GroupIndex;
                 int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
+                if (apiKey == null)
+                {
+                    PrevButton.IsEnabled = false;
+                    NextButton.IsEnabled = false;
+                    return;
+                }
+                else
+                {
+                    PrevButton.IsEnabled = true;
+                    NextButton.IsEnabled = true;
+                }
                 title = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].Title;
                 PageTitle.Text = title;
                 subscribeID = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].SubscribeID;
@@ -88,6 +99,7 @@ namespace FeedLadder
         private async void Unread(string subscribe_id)
         {
             FeedListResult.Visibility = Visibility.Collapsed;
+            NoItemLabel.Visibility = Visibility.Collapsed;
             ProgressIndicator.IsActive = true;
 
             try
@@ -134,9 +146,9 @@ namespace FeedLadder
                 //// Set as read
                 //Touch(subscribeID, timeStamp);
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog("Error @ Unread").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ Unread").ShowAsync();
             }
         }
 
@@ -155,9 +167,9 @@ namespace FeedLadder
                 HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/touch"), new HttpFormUrlEncodedContent(postData));
                 ProgressIndicator.IsActive = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog("Error @ Touch").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ Touch").ShowAsync();
             }
         }
 
@@ -176,9 +188,9 @@ namespace FeedLadder
                 HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/touch"), new HttpFormUrlEncodedContent(postData));
                 ProgressIndicator.IsActive = false;
             }
-            catch (Exception ex)
+            catch (Exception)
             {
-                await new MessageDialog("Error @ TouchAll").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ TouchAll").ShowAsync();
             }
         }
 
@@ -240,7 +252,10 @@ namespace FeedLadder
             {
                 if (string.IsNullOrEmpty(item.Body) == false)
                 {
-                    Frame.Navigate(typeof(EntryPage), item);
+                    if(SubFrame.Visibility == Visibility.Visible)
+                        SubFrame.Navigate(typeof(EntryPage), item);
+                    else
+                        Frame.Navigate(typeof(EntryPage), item);
                 }
                 else // if body is null/empty, open browser directly
                 {
@@ -248,6 +263,7 @@ namespace FeedLadder
                 }
             }
         }
+
 
         private void FeedListResult_Tapped(object sender, TappedRoutedEventArgs e)
         {
@@ -257,7 +273,6 @@ namespace FeedLadder
                 sender = null;
             }
             pressedPin = false;
-            e.Handled = true;
         }
 
         // At right-click, the item is not selected in ListView
@@ -291,15 +306,19 @@ namespace FeedLadder
             // Mark this feed as read
             int group = (Application.Current as Application).GroupIndex;
             int item = (Application.Current as Application).ItemIndex;
-            //(App.Current as App).SubscriptionList[group][item].UnreadCount = null;
-            (Application.Current as Application).SubscriptionList[group][item].isRead = true;
+            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].UnreadCount = null;
+            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
             //if(itemIndex > (App.Current as App).SubscriptionList.Count - 2)
             if (item > (Application.Current as Application).SubscriptionList[group].Count - 2)
             {
                 if (Frame.CanGoBack)
+                {
                     Frame.GoBack();
+                }
+                else
+                    NextButton.IsEnabled = false;
             }
             //else if (itemIndex > -1)
             else
@@ -334,14 +353,18 @@ namespace FeedLadder
             // Mark this feed as read
             int group = (Application.Current as Application).GroupIndex;
             int item = (Application.Current as Application).ItemIndex;
-            //(App.Current as App).SubscriptionList[group][item].UnreadCount = null;
-            (Application.Current as Application).SubscriptionList[group][item].isRead = true;
+            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].UnreadCount = null;
+            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
             if (item == 0)
             {
                 if (Frame.CanGoBack)
+                {
                     Frame.GoBack();
+                }
+                else
+                    PrevButton.IsEnabled = false;
             }
             else
             {
@@ -372,9 +395,18 @@ namespace FeedLadder
             GoNextFeed();
         }
 
-        private void RootPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        private void FeedPage_Loaded(object sender, RoutedEventArgs e)
         {
+            // Show SubFrame
+            if (SubFrame.Visibility == Visibility.Visible)
+            {
+                SubFrame.Navigate(typeof(EntryPage));
 
+                // Delete backstack
+                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                int count = Frame.BackStack.Count;
+                if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
+            }
         }
     }
 }

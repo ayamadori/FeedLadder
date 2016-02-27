@@ -130,5 +130,47 @@ namespace FeedLadder
             //TODO: アプリケーションの状態を保存してバックグラウンドの動作があれば停止します
             deferral.Complete();
         }
+
+        // refer to https://msdn.microsoft.com/en-us/library/windows/apps/mt243292.aspx
+        protected override void OnShareTargetActivated(ShareTargetActivatedEventArgs args)
+        {
+            // Code to handle activation goes here.	
+#if DEBUG
+            if (System.Diagnostics.Debugger.IsAttached)
+            {
+                this.DebugSettings.EnableFrameRateCounter = false;
+            }
+#endif
+
+            Frame rootFrame = Window.Current.Content as Frame;
+
+            // ウィンドウに既にコンテンツが表示されている場合は、アプリケーションの初期化を繰り返さずに、
+            // ウィンドウがアクティブであることだけを確認してください
+            if (rootFrame == null)
+            {
+                // ナビゲーション コンテキストとして動作するフレームを作成し、最初のページに移動します
+                rootFrame = new Frame();
+
+                rootFrame.NavigationFailed += OnNavigationFailed;
+
+                if (args.PreviousExecutionState == ApplicationExecutionState.Terminated)
+                {
+                    //TODO: 以前中断したアプリケーションから状態を読み込みます
+                }
+
+                // フレームを現在のウィンドウに配置します
+                Window.Current.Content = rootFrame;
+            }
+
+            if (rootFrame.Content == null)
+            {
+                // ナビゲーション スタックが復元されない場合は、最初のページに移動します。
+                // このとき、必要な情報をナビゲーション パラメーターとして渡して、新しいページを
+                //構成します
+                rootFrame.Navigate(typeof(SharePage), args.ShareOperation);
+            }
+            // 現在のウィンドウがアクティブであることを確認します
+            Window.Current.Activate();
+        }
     }
 }

@@ -8,34 +8,29 @@
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
     RequestedTheme="Light">
-    
-    <Page.BottomAppBar>
-        <CommandBar>
+
+    <Grid x:Name="LayoutRoot" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <TextBlock x:Name="PageTitle" Text="EntryPageTitle" Margin="12,32,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
+
+            <!--ContentPanel - 追加コンテンツをここに入力します-->
+        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0">
+            <TextBlock x:Name="NoBodyLabel" TextWrapping="Wrap" Text="No Body" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
+            <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
+            <WebView x:Name="BrowserComponent" Opacity="0" LoadCompleted="BrowserComponent_LoadCompleted" NavigationStarting="BrowserComponent_NavigationStarting" Visibility="Collapsed"/>
+        </Grid>
+
+        <CommandBar Grid.Row="2">
             <CommandBar.Content>
                 <Grid/>
             </CommandBar.Content>
             <AppBarButton x:Name="OpenBrowserButton" Icon="Globe" Label="open" Click="OpenBrowserButton_Click"/>
             <AppBarButton x:Name="ShareButton" Icon="ReShare" Label="share" Click="ShareButton_Click"/>
         </CommandBar>
-    </Page.BottomAppBar>
-
-    <Grid x:Name="LayoutRoot" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}">
-        <Grid.RowDefinitions>
-            <RowDefinition Height="Auto"/>
-            <RowDefinition Height="*"/>
-        </Grid.RowDefinitions>
-
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,16,0,0">
-            <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource BaseTextBlockStyle}" FontWeight="Bold"/>
-            <TextBlock x:Name="PageTitle" Text="EntryPageTitle" Margin="0,16,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
-        </StackPanel>
-
-        <!--ContentPanel - 追加コンテンツをここに入力します-->
-        <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0">
-            <TextBlock x:Name="NoBodyLabel" TextWrapping="Wrap" Text="No Body" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
-            <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
-            <WebView x:Name="BrowserComponent" Opacity="0" LoadCompleted="BrowserComponent_LoadCompleted" NavigationStarting="BrowserComponent_NavigationStarting" Visibility="Collapsed"/>
-        </Grid>
-        <TextBlock x:Name="testblock"/>
     </Grid>
 </Page>

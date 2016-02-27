@@ -21,7 +21,10 @@
         <Grid x:Name="RootGrid" Grid.Row="1" Margin="12,20,12,12">
             <StackPanel>
                 <ToggleSwitch x:Name="AdBlockSwitch" Header="Block ad feed" Toggled="AdBlockSwitch_Toggled"/>
-                <ComboBox x:Name="SortModeComboBox" Header="Sort" ItemsSource="{Binding}" SelectionChanged="SortModeComboBox_SelectionChanged" HorizontalAlignment="Stretch" Margin="0,12"/>
+                <ComboBox x:Name="SortModeComboBox" Header="Sort" ItemsSource="{Binding}" SelectionChanged="SortModeComboBox_SelectionChanged" Margin="0,12" Width="280"/>
+                <TextBlock Text="Account" Style="{StaticResource TitleTextBlockStyle}" Margin="0,24,0,12"/>
+                <TextBlock Text="Username" Margin="0,0,0,8"/>
+                <TextBox x:Name="UsernameTextBox" Text="username" IsReadOnly="True" Width="280" HorizontalAlignment="Left"/>
                 <Button x:Name="LogoutButton" Content="Logout from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,24"/>
             </StackPanel>
         </Grid>
