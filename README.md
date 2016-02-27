@@ -26,6 +26,7 @@ http://www.gnu.org/licenses/gpl-3.0.html
 ## Version History
 - Version 2.1.0
  * Support responsive(?) UI
+ * Share to subscription(You need to login to LDR)
 
 - Version 2.0.0
  * This version and newer supports Windows 10 only
