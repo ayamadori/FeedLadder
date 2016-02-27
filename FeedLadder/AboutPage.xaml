@@ -19,7 +19,7 @@
         <Grid x:Name="RootGrid" Grid.Row="1" Margin="12">
             <ScrollViewer>
                 <StackPanel>
-                    <TextBlock Text="Feedladder&#xA;Version 2.1.0&#xA;&#xA;Copyright (c) Ayamadori" TextWrapping="Wrap"/>
+                    <TextBlock Text="Feedladder&#xA;Version 2.1.1&#xA;&#xA;Copyright (c) Ayamadori" TextWrapping="Wrap"/>
                     <HyperlinkButton Content="https://sites.google.com/site/ayamadori/" NavigateUri="https://sites.google.com/site/ayamadori"/>
                     <HyperlinkButton Content="Twitter: @ayamadori" NavigateUri="https://twitter.com/ayamadori"/>
                     <HyperlinkButton Content="Mail: ayamadori@gmail.com" NavigateUri="mailto:ayamadori@gmail.com"/>

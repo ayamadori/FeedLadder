@@ -313,6 +313,7 @@ namespace FeedLadder
             //if(itemIndex > (App.Current as App).SubscriptionList.Count - 2)
             if (item > (Application.Current as Application).SubscriptionList[group].Count - 2)
             {
+                int count = Frame.BackStack.Count;
                 if (Frame.CanGoBack)
                 {
                     Frame.GoBack();
@@ -359,6 +360,7 @@ namespace FeedLadder
 
             if (item == 0)
             {
+                int count = Frame.BackStack.Count;
                 if (Frame.CanGoBack)
                 {
                     Frame.GoBack();
@@ -401,11 +403,6 @@ namespace FeedLadder
             if (SubFrame.Visibility == Visibility.Visible)
             {
                 SubFrame.Navigate(typeof(EntryPage));
-
-                // Delete backstack
-                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
-                int count = Frame.BackStack.Count;
-                if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
             }
         }
     }

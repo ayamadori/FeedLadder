@@ -40,11 +40,6 @@ namespace FeedLadder
             if (SubFrame.Visibility == Visibility.Visible)
             {
                 SubFrame.Navigate(typeof(FeedPage));
-
-                // Delete backstack
-                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
-                int count = Frame.BackStack.Count;
-                if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
             }
 
             RefreshButton.IsEnabled = false;
@@ -107,17 +102,7 @@ namespace FeedLadder
         {
             base.OnNavigatedTo(e);
 
-            //if (SubFrame.Visibility == Visibility.Visible)
-            //{
-            //    SubFrame.Navigate(typeof(FeedPage));
-
-            //    // Delete backstack
-            //    // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
-            //    int count = Frame.BackStack.Count;
-            //    if (count > 0 && Window.Current.Bounds.Width >= 1024) Frame.BackStack.RemoveAt(count - 1);
-            //}
-
-                if (RootPivot.SelectedIndex == 1) // pinned
+            if (RootPivot.SelectedIndex == 1) // pinned
             {
                 return;
             }
@@ -338,7 +323,13 @@ namespace FeedLadder
                     (Windows.UI.Xaml.Application.Current as Application).GroupIndex = groupIndex;
                     (Windows.UI.Xaml.Application.Current as Application).ItemIndex = itemIndex;
                     if (SubFrame.Visibility == Visibility.Visible)
+                    {
                         SubFrame.Navigate(typeof(FeedPage), apiKey);
+
+                        // Delete backstack in SubFrame
+                        // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                        SubFrame.BackStack.RemoveAt(SubFrame.BackStack.Count - 1);
+                    }
                     else
                         Frame.Navigate(typeof(FeedPage), apiKey);
                 }

@@ -72,7 +72,7 @@
         <!--If ManipulationMode is "System,TranlationX,TranslationY", can't tap item in Mobile...-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0" ManipulationMode="All" ManipulationCompleted="ContentPanel_ManipulationCompleted">
             <TextBlock x:Name="NoItemLabel" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}"/>
-            <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="100" Height="100"/>
+            <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60"/>
             <ListView x:Name="FeedListResult" ItemTemplate="{StaticResource FeedItemTemplate}" Tapped="FeedListResult_Tapped" HorizontalAlignment="Stretch">
                 <!--Stretch ListViewItem http://d.hatena.ne.jp/CoMo/20110421/1303394273-->
                 <ListView.ItemContainerStyle>

@@ -113,7 +113,7 @@
         <PivotItem Header="unread">
             <Grid>
                 <TextBlock x:Name="NoItemLabel" Margin="0" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
-                <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="100" Height="100"/>
+                <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="60" Height="60"/>
 
                 <SemanticZoom x:Name="SubscriptionListResult" Visibility="Collapsed">
                     <SemanticZoom.ZoomedInView>
