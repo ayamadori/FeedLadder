@@ -117,28 +117,42 @@ namespace FeedLadder
                     {
                         if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i].UnreadCount != null)
                         {
-                            SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i]);
+                            SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i], ScrollIntoViewAlignment.Leading);
                             return;
                         }
                     }
                     if (group > (Windows.UI.Xaml.Application.Current as Application).SubscriptionList.Count - 2)
                     {
-                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item]);
+                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item], ScrollIntoViewAlignment.Leading);
                     }
                     else
                     {
-                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group + 1][0]);
+                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group + 1][0], ScrollIntoViewAlignment.Leading);
                     }
                 }
                 else
                 {
-                    SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item]);
+                    SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item], ScrollIntoViewAlignment.Leading);
                 }
             }
         }
 
         private void RefreshButton_Click(object sender, RoutedEventArgs e)
         {
+            if (SubFrame.Visibility == Visibility.Visible)
+            {
+                SubFrame.Navigate(typeof(FeedPage), null);
+
+                // Delete backstack in SubFrame
+                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                if (SubFrame.BackStack.Count > 0) SubFrame.BackStack.RemoveAt(SubFrame.BackStack.Count - 1);
+            }
+
+            // Reset index
+            (Windows.UI.Xaml.Application.Current as Application).GroupIndex = -1;
+            (Windows.UI.Xaml.Application.Current as Application).ItemIndex = -1;
+
+            // Get subscription items
             Subs(1);
         }
 
@@ -190,6 +204,10 @@ namespace FeedLadder
                         int _end = responseString.IndexOf("\"", _start);
                         userName = responseString.Substring(_start, _end - _start);
 
+                        // (Re-)Set token to cookie
+                        HttpCookie readerSid = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
+                        filter.CookieManager.SetCookie(readerSid);
+
                         RefreshButton.IsEnabled = true;
                         break;
                     case Windows.Security.Authentication.Web.WebAuthenticationStatus.ErrorHttp:
@@ -215,17 +233,13 @@ namespace FeedLadder
         /// <param name="unread"></param>
         private async void Subs(int unread)
         {
+            SubscriptionList.Source = null;
             SubscriptionListResult.Visibility = Visibility.Collapsed;
             NoItemLabel.Visibility = Visibility.Collapsed;
             ProgressIndicator.IsActive = true;
 
             try
             {
-                // (Re-)Set token to cookie
-                HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
-                HttpCookie readerSid = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
-                filter.CookieManager.SetCookie(readerSid);
-
                 HttpClient httpClient = new HttpClient();
                 Dictionary<string, string> postData = new Dictionary<string, string>() { { "ApiKey", apiKey } };
                 HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/subs?unread=" + unread + "&from_id=0&limit=100"), new HttpFormUrlEncodedContent(postData));
@@ -266,17 +280,12 @@ namespace FeedLadder
                             break;
                     }
                 }
-                // Data binding
-                //(Application.Current as App).SubscriptionList = subItems;
-                //this.subscriptionListResult.ItemsSource = (Application.Current as App).SubscriptionList;
-
-                // default
-                List<Group<SubscriptionItem>> source = Group<SubscriptionItem>.CreateGroups(subItems, item => { return item.Folder; }, false);
 
                 var roamingSettings = Windows.Storage.ApplicationData.Current.RoamingSettings;
                 // Read data from a simple setting
                 string sortMode = roamingSettings.Values["SortModeString"] as string;
                 if (sortMode == null) sortMode = "Folder"; // Default is folder
+                List<Group<SubscriptionItem>> source = null;
                 switch (sortMode)
                 {
                     case "Folder":
@@ -292,14 +301,10 @@ namespace FeedLadder
                 ProgressIndicator.IsActive = false;
 
                 if (subItems.Count > 0)
-                {
-                    NoItemLabel.Visibility = Visibility.Collapsed;
                     SubscriptionListResult.Visibility = Visibility.Visible;
-                }
                 else
-                {
                     NoItemLabel.Visibility = Visibility.Visible;
-                }
+
                 RefreshButton.IsEnabled = true;
             }
             catch (Exception)
@@ -328,7 +333,7 @@ namespace FeedLadder
 
                         // Delete backstack in SubFrame
                         // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
-                        SubFrame.BackStack.RemoveAt(SubFrame.BackStack.Count - 1);
+                        if(SubFrame.BackStack.Count > 0) SubFrame.BackStack.RemoveAt(SubFrame.BackStack.Count - 1);
                     }
                     else
                         Frame.Navigate(typeof(FeedPage), apiKey);
@@ -368,6 +373,7 @@ namespace FeedLadder
         /// </summary>
         private async void PinAll()
         {
+            PinList.ItemsSource = null;
             PinList.Visibility = Visibility.Collapsed;
             PinNoItemLabel.Visibility = Visibility.Collapsed;
             PinProgressIndicator.IsActive = true;
@@ -400,14 +406,9 @@ namespace FeedLadder
                 PinProgressIndicator.IsActive = false;
 
                 if (pinItems.Count > 0)
-                {
-                    PinNoItemLabel.Visibility = Visibility.Collapsed;
                     PinList.Visibility = Visibility.Visible;
-                }
                 else
-                {
                     PinNoItemLabel.Visibility = Visibility.Visible;
-                }
             }
             catch (Exception)
             {

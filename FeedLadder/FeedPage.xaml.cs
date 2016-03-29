@@ -49,6 +49,8 @@ namespace FeedLadder
                 int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
                 if (apiKey == null)
                 {
+                    PageTitle.Text = "Feeds";
+                    FeedListResult.Visibility = Visibility.Collapsed;
                     PrevButton.IsEnabled = false;
                     NextButton.IsEnabled = false;
                     return;
@@ -98,6 +100,7 @@ namespace FeedLadder
         /// <param name="subscribe_id">subscribe_id</param>
         private async void Unread(string subscribe_id)
         {
+            FeedListResult.ItemsSource = null;
             FeedListResult.Visibility = Visibility.Collapsed;
             NoItemLabel.Visibility = Visibility.Collapsed;
             ProgressIndicator.IsActive = true;
@@ -107,10 +110,6 @@ namespace FeedLadder
                 HttpClient httpClient = new HttpClient();
                 Dictionary<string, string> postData = new Dictionary<string, string>() { { "subscribe_id", subscribe_id }, { "ApiKey", apiKey } };
                 HttpResponseMessage response = await httpClient.PostAsync(new Uri(domainURL + "/api/pin/unread"), new HttpFormUrlEncodedContent(postData));
-
-                FeedListResult.Visibility = Visibility.Visible;
-                ProgressIndicator.IsActive = false;
-
                 string res = await response.Content.ReadAsStringAsync();
 
                 // refer to http://blogs.gine.jp/taka/archives/2106
@@ -136,15 +135,12 @@ namespace FeedLadder
                     item.Link = WebUtility.HtmlDecode(item.Link);
                 }
                 FeedListResult.ItemsSource = feedItems.Items;
+                ProgressIndicator.IsActive = false;
 
-                if (feedItems.Items.Count == 0)
-                {
-                    FeedListResult.Visibility = Visibility.Collapsed;
+                if (feedItems.Items.Count > 0)
+                    FeedListResult.Visibility = Visibility.Visible;
+                else
                     NoItemLabel.Visibility = Visibility.Visible;
-                }
-
-                //// Set as read
-                //Touch(subscribeID, timeStamp);
             }
             catch (Exception)
             {
@@ -310,24 +306,18 @@ namespace FeedLadder
             (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
-            //if(itemIndex > (App.Current as App).SubscriptionList.Count - 2)
             if (item > (Application.Current as Application).SubscriptionList[group].Count - 2)
             {
-                int count = Frame.BackStack.Count;
                 if (Frame.CanGoBack)
-                {
                     Frame.GoBack();
-                }
                 else
                     NextButton.IsEnabled = false;
             }
-            //else if (itemIndex > -1)
             else
             {
                 FeedListResult.Visibility = Visibility.Collapsed;
 
                 // Go next feed
-                //SubscriptionItem next = (App.Current as App).SubscriptionList[itemIndex + 1];
                 SubscriptionItem next = (Application.Current as Application).SubscriptionList[group][item + 1];
                 PageTitle.Text = next.Title;
                 subscribeID = next.SubscribeID;
@@ -360,11 +350,8 @@ namespace FeedLadder
 
             if (item == 0)
             {
-                int count = Frame.BackStack.Count;
                 if (Frame.CanGoBack)
-                {
                     Frame.GoBack();
-                }
                 else
                     PrevButton.IsEnabled = false;
             }

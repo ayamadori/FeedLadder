@@ -112,7 +112,7 @@
         <Pivot x:Name="RootPivot" Grid.Row="0" Grid.Column="0" Title="FEEDLADDER" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
         <PivotItem Header="unread">
             <Grid>
-                <TextBlock x:Name="NoItemLabel" Margin="0" TextWrapping="Wrap" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock x:Name="NoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="60" Height="60"/>
 
                 <SemanticZoom x:Name="SubscriptionListResult" Visibility="Collapsed">
@@ -131,7 +131,7 @@
         </PivotItem>
         <PivotItem Header="pinned">
             <Grid>
-                <TextBlock x:Name="PinNoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
+                        <TextBlock x:Name="PinNoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource SubtitleTextBlockStyle}" HorizontalAlignment="Center" VerticalAlignment="Center"/>
                 <ProgressRing x:Name="PinProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="100" Height="100"/>
                 <ListView x:Name="PinList" Tapped="PinList_Tapped">
                     <ListView.ItemTemplate>

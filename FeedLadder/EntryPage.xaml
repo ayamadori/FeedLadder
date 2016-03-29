@@ -30,7 +30,12 @@
                 <Grid/>
             </CommandBar.Content>
             <AppBarButton x:Name="OpenBrowserButton" Icon="Globe" Label="open" Click="OpenBrowserButton_Click"/>
-            <AppBarButton x:Name="ShareButton" Icon="ReShare" Label="share" Click="ShareButton_Click"/>
+            <AppBarButton x:Name="ShareButton" Label="share" Click="ShareButton_Click">
+                <!--Share icon is NOT found in AppBarButton.Icon-->
+                <AppBarButton.Icon>
+                    <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE72D;"/>
+                </AppBarButton.Icon>
+            </AppBarButton>
         </CommandBar>
     </Grid>
 </Page>
