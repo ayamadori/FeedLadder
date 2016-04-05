@@ -134,17 +134,22 @@ namespace FeedLadder
                     item.Title = WebUtility.HtmlDecode(item.Title);
                     item.Link = WebUtility.HtmlDecode(item.Link);
                 }
+
+                // Data binding
                 FeedListResult.ItemsSource = feedItems.Items;
-                ProgressIndicator.IsActive = false;
 
                 if (feedItems.Items.Count > 0)
                     FeedListResult.Visibility = Visibility.Visible;
                 else
                     NoItemLabel.Visibility = Visibility.Visible;
+
+                ProgressIndicator.IsActive = false;
             }
             catch (Exception)
             {
                 await new MessageDialog("This app could not send/receive data.", "Error @ Unread").ShowAsync();
+                NoItemLabel.Visibility = Visibility.Visible;
+                ProgressIndicator.IsActive = false;
             }
         }
 

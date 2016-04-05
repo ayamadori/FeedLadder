@@ -298,18 +298,19 @@ namespace FeedLadder
                 (Windows.UI.Xaml.Application.Current as Application).SubscriptionList = source;
                 SubscriptionList.Source = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList;
 
-                ProgressIndicator.IsActive = false;
-
                 if (subItems.Count > 0)
                     SubscriptionListResult.Visibility = Visibility.Visible;
                 else
                     NoItemLabel.Visibility = Visibility.Visible;
 
                 RefreshButton.IsEnabled = true;
+                ProgressIndicator.IsActive = false;
             }
             catch (Exception)
             {
                 await new MessageDialog("This app could not send/receive data.", "Error @ Subs").ShowAsync();
+                NoItemLabel.Visibility = Visibility.Visible;
+                ProgressIndicator.IsActive = false;
             }
         }
 
@@ -403,16 +404,18 @@ namespace FeedLadder
                 // Data binding
                 PinList.ItemsSource = pinItems;
 
-                PinProgressIndicator.IsActive = false;
-
                 if (pinItems.Count > 0)
                     PinList.Visibility = Visibility.Visible;
                 else
                     PinNoItemLabel.Visibility = Visibility.Visible;
+
+                PinProgressIndicator.IsActive = false;
             }
             catch (Exception)
             {
                 await new MessageDialog("This app could not send/receive data." ,"Error @ PinAll").ShowAsync();
+                PinNoItemLabel.Visibility = Visibility.Visible;
+                PinProgressIndicator.IsActive = false;
             }
         }
 
