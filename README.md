@@ -24,7 +24,10 @@ GNU GENERAL PUBLIC LICENSE Version 3
 http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Version History
-- Version 2.1.1
+- Version 2.1.2
+ * Minor fix and improvements
+
+- Version 2.1.0
  * Support responsive(?) UI
  * Share to subscription(You need to login to LDR)
 
