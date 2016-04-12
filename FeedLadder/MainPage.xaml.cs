@@ -107,15 +107,18 @@ namespace FeedLadder
                 return;
             }
 
+            // Reset list for refresh
+            SubscriptionList.Source = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList;
+
             int group = (Windows.UI.Xaml.Application.Current as Application).GroupIndex;
             int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
             if (group > -1)
             {
-                if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].UnreadCount == null)
-                {
+                if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead)
+                    {
                     for (int i = item + 1; i < (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group].Count; i++)
                     {
-                        if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i].UnreadCount != null)
+                        if (!(Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i].isRead)
                         {
                             SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i], ScrollIntoViewAlignment.Leading);
                             return;

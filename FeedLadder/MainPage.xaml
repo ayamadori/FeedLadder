@@ -1,10 +1,11 @@
 ﻿<Page
-    x:Class="FeedLadder.MainPage"
     xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
     xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
     xmlns:local="using:FeedLadder"
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:Interactivity="using:Microsoft.Xaml.Interactivity" xmlns:Core="using:Microsoft.Xaml.Interactions.Core"
+    x:Class="FeedLadder.MainPage"
     mc:Ignorable="d"
     NavigationCacheMode="Enabled"
     Loaded="MainPage_Loaded">
@@ -14,41 +15,31 @@
             <TextBlock Text="{Binding Key}" Style="{StaticResource TitleTextBlockStyle}"/>
         </DataTemplate>
 
-        <DataTemplate x:Key="SubscriptionItemTemplate">
-            <!--<VisualStateManager.CustomVisualStateManager>
-                    <ec:ExtendedVisualStateManager/>
-                </VisualStateManager.CustomVisualStateManager>
-                <VisualStateManager.VisualStateGroups>
-                    <VisualStateGroup x:Name="ReadStateGroup">
-                        <VisualState x:Name="IsRead">
-                            <Storyboard>
-                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(TextBlock.Foreground)" Storyboard.TargetName="textBlock">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneDisabledBrush}"/>
-                                </ObjectAnimationUsingKeyFrames>
-                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(Border.Background)" Storyboard.TargetName="border">
-                                    <DiscreteObjectKeyFrame KeyTime="0" Value="{StaticResource PhoneDisabledBrush}"/>
-                                </ObjectAnimationUsingKeyFrames>
-                                <ObjectAnimationUsingKeyFrames Storyboard.TargetProperty="(UIElement.Visibility)" Storyboard.TargetName="textBlock1">
-                                    <DiscreteObjectKeyFrame KeyTime="0">
-                                        <DiscreteObjectKeyFrame.Value>
-                                            <Visibility>Collapsed</Visibility>
-                                        </DiscreteObjectKeyFrame.Value>
-                                    </DiscreteObjectKeyFrame>
-                                </ObjectAnimationUsingKeyFrames>
-                            </Storyboard>
-                        </VisualState>
-                        <VisualState x:Name="Unread"/>
-                    </VisualStateGroup>
-                </VisualStateManager.VisualStateGroups>-->
-                <StackPanel Orientation="Horizontal">
-                    <!--<i:Interaction.Behaviors>
-                        <ec:DataStateBehavior Value="true" TrueState="IsRead" Binding="{Binding isRead}" FalseState="Unread"/>
-                    </i:Interaction.Behaviors>-->
-                    <Border x:Name="border" Height="40" Width="40" Background="{ThemeResource SystemControlForegroundAccentBrush}">
-                        <TextBlock x:Name="textBlock1" Text="{Binding UnreadCount}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="White"/>
-                    </Border>
-                    <TextBlock Text="{Binding Title}" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                </StackPanel>
+        <DataTemplate x:Key="SubscriptionItemTemplate" x:DataType="local:SubscriptionItem">
+            <StackPanel Orientation="Horizontal">
+                <Border x:Name="CountBorder" Height="40" Width="40" Background="{ThemeResource SystemControlForegroundAccentBrush}">
+                    <!--http://stackoverflow.com/questions/32897589/inconsistent-behavior-of-behaviors-sdk-->
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:DataTriggerBehavior Binding="{x:Bind isRead}" Value="True">
+                            <Core:ChangePropertyAction TargetObject="{Binding ElementName=CountBorder}" PropertyName="Background" Value="Gray"/>
+                        </Core:DataTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                    <TextBlock x:Name="Count" Text="{x:Bind UnreadCount}" HorizontalAlignment="Center" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}" Foreground="White">
+                        <Interactivity:Interaction.Behaviors>
+                            <Core:DataTriggerBehavior Binding="{x:Bind isRead}" Value="True">
+                                <Core:ChangePropertyAction TargetObject="{Binding ElementName=Count}" PropertyName="Foreground" Value="Gray"/>
+                            </Core:DataTriggerBehavior>
+                        </Interactivity:Interaction.Behaviors>
+                    </TextBlock>
+                </Border>
+                <TextBlock x:Name="ItemTitle" Text="{x:Bind Title}" Margin="12,0,0,0" TextWrapping="Wrap" VerticalAlignment="Center" Style="{StaticResource SubtitleTextBlockStyle}">
+                    <Interactivity:Interaction.Behaviors>
+                        <Core:DataTriggerBehavior Binding="{x:Bind isRead}" Value="True">
+                            <Core:ChangePropertyAction TargetObject="{Binding ElementName=ItemTitle}" PropertyName="Foreground" Value="Gray"/>
+                        </Core:DataTriggerBehavior>
+                    </Interactivity:Interaction.Behaviors>
+                </TextBlock>
+            </StackPanel>
         </DataTemplate>
 
         <DataTemplate x:Key="ZoomedOutAuthorTemplate">
@@ -109,56 +100,56 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-        <Pivot x:Name="RootPivot" Grid.Row="0" Grid.Column="0" Title="FEEDLADDER" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
-        <PivotItem Header="unread">
-            <Grid>
+            <Pivot x:Name="RootPivot" Grid.Row="0" Grid.Column="0" Title="FEEDLADDER" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
+                <PivotItem Header="unread">
+                    <Grid>
                         <TextBlock x:Name="NoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource SubtitleTextBlockStyle}" Margin="12,12,0,0"/>
-                <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="60" Height="60"/>
+                        <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="60" Height="60"/>
 
-                <SemanticZoom x:Name="SubscriptionListResult" Visibility="Collapsed">
-                    <SemanticZoom.ZoomedInView>
-                        <ListView x:Name="SubscriptionListView" ItemsSource="{Binding Source={StaticResource SubscriptionList}}" ItemTemplate="{StaticResource SubscriptionItemTemplate}" Tapped="SubscriptionListView_Tapped">
-                            <ListView.GroupStyle>
-                                <GroupStyle HeaderTemplate="{StaticResource SubscriptionGroupHeaderTemplate}" HidesIfEmpty="True"/>
-                            </ListView.GroupStyle>
-                        </ListView>
-                    </SemanticZoom.ZoomedInView>
-                    <SemanticZoom.ZoomedOutView>
-                        <ListView ItemsSource="{Binding CollectionGroups, Source={StaticResource SubscriptionList}}" ItemTemplate="{StaticResource ZoomedOutAuthorTemplate}"/>
-                    </SemanticZoom.ZoomedOutView>
-                </SemanticZoom>
-            </Grid>
-        </PivotItem>
-        <PivotItem Header="pinned">
-            <Grid>
+                        <SemanticZoom x:Name="SubscriptionListResult" Visibility="Collapsed">
+                            <SemanticZoom.ZoomedInView>
+                                <ListView x:Name="SubscriptionListView" ItemsSource="{Binding Source={StaticResource SubscriptionList}}" ItemTemplate="{StaticResource SubscriptionItemTemplate}" Tapped="SubscriptionListView_Tapped">
+                                    <ListView.GroupStyle>
+                                        <GroupStyle HeaderTemplate="{StaticResource SubscriptionGroupHeaderTemplate}" HidesIfEmpty="True"/>
+                                    </ListView.GroupStyle>
+                                </ListView>
+                            </SemanticZoom.ZoomedInView>
+                            <SemanticZoom.ZoomedOutView>
+                                <ListView ItemsSource="{Binding CollectionGroups, Source={StaticResource SubscriptionList}}" ItemTemplate="{StaticResource ZoomedOutAuthorTemplate}"/>
+                            </SemanticZoom.ZoomedOutView>
+                        </SemanticZoom>
+                    </Grid>
+                </PivotItem>
+                <PivotItem Header="pinned">
+                    <Grid>
                         <TextBlock x:Name="PinNoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource SubtitleTextBlockStyle}" Margin="12,12,0,0"/>
-                <ProgressRing x:Name="PinProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="100" Height="100"/>
-                <ListView x:Name="PinList" Tapped="PinList_Tapped">
-                    <ListView.ItemTemplate>
-                        <DataTemplate>
-                            <TextBlock Text="{Binding Title}" TextWrapping="NoWrap" Style="{StaticResource SubtitleTextBlockStyle}"/>
-                        </DataTemplate>
-                    </ListView.ItemTemplate>
-                </ListView>
-            </Grid>
-        </PivotItem>
-    </Pivot>
+                        <ProgressRing x:Name="PinProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="100" Height="100"/>
+                        <ListView x:Name="PinList" Tapped="PinList_Tapped">
+                            <ListView.ItemTemplate>
+                                <DataTemplate>
+                                    <TextBlock Text="{Binding Title}" TextWrapping="NoWrap" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                </DataTemplate>
+                            </ListView.ItemTemplate>
+                        </ListView>
+                    </Grid>
+                </PivotItem>
+            </Pivot>
 
-        <CommandBar x:Name="ApplicationBar" Grid.Row="1">
-            <CommandBar.SecondaryCommands>
-                <AppBarButton x:Name="SettingButton" Label="Settings" Click="SettingButton_Click"/>
-                <AppBarButton x:Name="AboutButton" Label="About" Click="AboutButton_Click"/>
-            </CommandBar.SecondaryCommands>
-            <CommandBar.Content>
-                <Grid/>
-            </CommandBar.Content>
-            <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="refresh" Click="RefreshButton_Click"/>
-        </CommandBar>
+            <CommandBar x:Name="ApplicationBar" Grid.Row="1">
+                <CommandBar.SecondaryCommands>
+                    <AppBarButton x:Name="SettingButton" Label="Settings" Click="SettingButton_Click"/>
+                    <AppBarButton x:Name="AboutButton" Label="About" Click="AboutButton_Click"/>
+                </CommandBar.SecondaryCommands>
+                <CommandBar.Content>
+                    <Grid/>
+                </CommandBar.Content>
+                <AppBarButton x:Name="RefreshButton" Icon="Refresh" Label="refresh" Click="RefreshButton_Click"/>
+            </CommandBar>
 
         </Grid>
-        
+
         <Frame x:Name="SubFrame" Grid.Column="1"/>
 
     </Grid>
-    
+
 </Page>

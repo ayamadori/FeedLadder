@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Runtime.Serialization;
 
 namespace FeedLadder
@@ -101,6 +102,7 @@ namespace FeedLadder
     /// refer to http://chorusde.hatenablog.jp/entry/20110910/1315620186
     /// </summary>
     [DataContract]
+    //public class SubscriptionItem : INotifyPropertyChanged
     public class SubscriptionItem
     {
         /// <summary>
@@ -131,10 +133,27 @@ namespace FeedLadder
         /// rate
         /// </summary>
         [DataMember(Name = "rate")]
-        public string Rate{ get; set; }
+        public string Rate { get; set; }
 
         // read flag
         public bool isRead { get; set; }
+        //private bool _isread;
+        //public bool isRead
+        //{
+        //    get{ return _isread; }
+        //    set
+        //    {
+        //        if (_isread == value) { return; }
+        //        _isread = value;
+        //        PropertyChanged?.Invoke(this, ReadPropertyChangedEventArgs);
+        //    }
+
+        //}
+
+        //// http://blog.okazuki.jp/entry/2015/05/09/124333
+        //public event PropertyChangedEventHandler PropertyChanged;
+        //private static readonly PropertyChangedEventArgs ReadPropertyChangedEventArgs = new PropertyChangedEventArgs(nameof(isRead));
+
     }
 
     /// <summary>

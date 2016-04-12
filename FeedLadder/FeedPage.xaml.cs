@@ -307,7 +307,6 @@ namespace FeedLadder
             // Mark this feed as read
             int group = (Application.Current as Application).GroupIndex;
             int item = (Application.Current as Application).ItemIndex;
-            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].UnreadCount = null;
             (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
@@ -349,7 +348,6 @@ namespace FeedLadder
             // Mark this feed as read
             int group = (Application.Current as Application).GroupIndex;
             int item = (Application.Current as Application).ItemIndex;
-            (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].UnreadCount = null;
             (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead = true;
             Touch(subscribeID, timeStamp);
 
