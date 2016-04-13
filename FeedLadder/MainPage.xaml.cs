@@ -151,12 +151,19 @@ namespace FeedLadder
                 if (SubFrame.BackStack.Count > 0) SubFrame.BackStack.RemoveAt(SubFrame.BackStack.Count - 1);
             }
 
-            // Reset index
-            (Windows.UI.Xaml.Application.Current as Application).GroupIndex = -1;
-            (Windows.UI.Xaml.Application.Current as Application).ItemIndex = -1;
+            if (RootPivot.SelectedIndex == 0) // Unread
+            {
+                // Reset index
+                (Windows.UI.Xaml.Application.Current as Application).GroupIndex = -1;
+                (Windows.UI.Xaml.Application.Current as Application).ItemIndex = -1;
 
-            // Get subscription items
-            Subs(1);
+                // Get subscription items
+                Subs(1);
+            }
+            else // Pinned
+            {
+                PinAll();
+            }
         }
 
         private void SettingButton_Click(object sender, RoutedEventArgs e)
@@ -348,13 +355,13 @@ namespace FeedLadder
         // from http://www.cocoloware.com/?p=32
         private void RootPivot_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
-            if (RootPivot.SelectedIndex == 0) //unreed
+            if (RootPivot.SelectedIndex == 0) // Unreed
             {
-                ApplicationBar.Visibility = Visibility.Visible;
+                //ApplicationBar.Visibility = Visibility.Visible;
             }
-            else if (RootPivot.SelectedIndex == 1) //pinned
+            else if (RootPivot.SelectedIndex == 1) // Pinned
             {
-                ApplicationBar.Visibility = Visibility.Collapsed;
+                //ApplicationBar.Visibility = Visibility.Collapsed;
                 PinAll();
             }
         }

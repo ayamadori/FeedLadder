@@ -126,8 +126,8 @@
                         <ProgressRing x:Name="PinProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Visibility="Collapsed" Width="100" Height="100"/>
                         <ListView x:Name="PinList" Tapped="PinList_Tapped">
                             <ListView.ItemTemplate>
-                                <DataTemplate>
-                                    <TextBlock Text="{Binding Title}" TextWrapping="NoWrap" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                                <DataTemplate x:DataType="local:PinItem">
+                                    <TextBlock Text="{x:Bind Title}" TextWrapping="NoWrap" Style="{StaticResource SubtitleTextBlockStyle}"/>
                                 </DataTemplate>
                             </ListView.ItemTemplate>
                         </ListView>

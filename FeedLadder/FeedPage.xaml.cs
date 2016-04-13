@@ -315,7 +315,30 @@ namespace FeedLadder
                 if (Frame.CanGoBack)
                     Frame.GoBack();
                 else
-                    NextButton.IsEnabled = false;
+                {
+                    // If can, go next group
+                    if (group < (Application.Current as Application).SubscriptionList.Count - 1)
+                    {
+                        FeedListResult.Visibility = Visibility.Collapsed;
+
+                        group++;
+                        item = 0;
+                        SubscriptionItem next = (Application.Current as Application).SubscriptionList[group][item];
+                        PageTitle.Text = next.Title;
+                        subscribeID = next.SubscribeID;
+                        Unread(subscribeID);
+                        (Application.Current as Application).GroupIndex = group;
+                        (Application.Current as Application).ItemIndex = item;
+
+                        // Update timestamp
+                        DateTime utcNow = DateTime.UtcNow;
+                        timeStamp = UnixEpochTime.GetUnixTime(utcNow) + (60 * 60 * 9);
+                    }
+                    else
+                    {
+                        NextButton.IsEnabled = false;
+                    }
+                }                
             }
             else
             {
@@ -356,7 +379,30 @@ namespace FeedLadder
                 if (Frame.CanGoBack)
                     Frame.GoBack();
                 else
-                    PrevButton.IsEnabled = false;
+                {
+                    // If can, go previous group
+                    if (group > 0)
+                    {
+                        FeedListResult.Visibility = Visibility.Collapsed;
+
+                        group--;
+                        item = (Application.Current as Application).SubscriptionList[group].Count - 1;
+                        SubscriptionItem prev = (Application.Current as Application).SubscriptionList[group][item];
+                        PageTitle.Text = prev.Title;
+                        subscribeID = prev.SubscribeID;
+                        Unread(subscribeID);
+                        (Application.Current as Application).GroupIndex = group;
+                        (Application.Current as Application).ItemIndex = item;
+
+                        // Update timestamp
+                        DateTime utcNow = DateTime.UtcNow;
+                        timeStamp = UnixEpochTime.GetUnixTime(utcNow) + (60 * 60 * 9);
+                    }
+                    else
+                    {
+                        PrevButton.IsEnabled = false;
+                    }
+                }
             }
             else
             {

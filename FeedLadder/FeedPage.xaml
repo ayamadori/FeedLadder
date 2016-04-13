@@ -11,14 +11,14 @@
 
     <Page.Resources>
 
-        <DataTemplate x:Key="FeedItemTemplate">
+        <DataTemplate x:Key="FeedItemTemplate" x:DataType="local:FeedItem">
             <Grid Margin="0,12,0,12" RightTapped="FeedItemTemplate_RightTapped">
                 <Grid.ColumnDefinitions>
                     <ColumnDefinition/>
                     <ColumnDefinition Width="Auto"/>
                 </Grid.ColumnDefinitions>
 
-                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{Binding Title}" Style="{StaticResource SubtitleTextBlockStyle}"/>
+                <TextBlock Grid.Column="0" TextWrapping="Wrap" Text="{x:Bind Title}" Style="{StaticResource SubtitleTextBlockStyle}"/>
                 <ToggleButton x:Name="PinButton" Grid.Column="1" Click="PinButton_Click" IsChecked="{Binding isPinned, Mode=TwoWay}" VerticalAlignment="Top" HorizontalAlignment="Right" Margin="12,4,0,0">
                     <SymbolIcon Symbol="Pin"/>
                 </ToggleButton>
@@ -51,7 +51,7 @@
                         <AdaptiveTrigger MinWindowWidth="720" />
                     </VisualState.StateTriggers>
                     <VisualState.Setters>
-                        <Setter Target="RootGrid.ColumnDefinitions[0].Width" Value="320"/>
+                        <Setter Target="RootGrid.ColumnDefinitions[0].Width" Value="360"/>
                         <Setter Target="SubFrame.Visibility" Value="Visible"/>
                         <Setter Target="RootGrid.ColumnDefinitions[1].Width" Value="*"/>
                     </VisualState.Setters>
