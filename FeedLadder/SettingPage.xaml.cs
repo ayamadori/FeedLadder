@@ -86,12 +86,28 @@ namespace FeedLadder
                     // Delete a simple setting
                     localSettings.Values.Remove("ApiKeyString");
                     UsernameTextBox.Text = "(No login)";
-                    await new MessageDialog("Please restart app.", "Logout").ShowAsync();
+
+                    // Reset cookies in livedoor.com and livedwango.com
+                    HttpBaseProtocolFilter filter = new HttpBaseProtocolFilter();
+                    var cookies = filter.CookieManager.GetCookies(new Uri(domainURL));
+                    // Delete cookies
+                    foreach (var cookie in cookies)
+                    {
+                        filter.CookieManager.DeleteCookie(cookie);
+                    }
+                    cookies = filter.CookieManager.GetCookies(new Uri("http://www.livedoor.com/"));
+                    // Delete cookies
+                    foreach (var cookie in cookies)
+                    {
+                        filter.CookieManager.DeleteCookie(cookie);
+                    }
+
+                    await new MessageDialog("Please restart app.", "Successfully Log Out").ShowAsync();
                 }
             }
             catch (Exception)
             {
-                await new MessageDialog("This app could not send/receive data.", "Error @ Logout").ShowAsync();
+                await new MessageDialog("This app could not send/receive data.", "Error @ Log Out").ShowAsync();
             }
         }
     }

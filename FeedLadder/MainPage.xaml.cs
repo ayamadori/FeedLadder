@@ -68,12 +68,12 @@ namespace FeedLadder
                             return;
                         }
                 }
-                HttpCookie readerSID = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
-                filter.CookieManager.SetCookie(readerSID);
 
                 try
                 {
                     // Check if can login to LDR
+                    HttpCookie readerSID = new HttpCookie("reader_sid", domainURL.Replace("http://", ""), "/") { Value = apiKey };
+                    filter.CookieManager.SetCookie(readerSID);
                     HttpClient httpClient = new HttpClient(filter);
                     string responseString = await httpClient.GetStringAsync(new Uri(domainURL + "/reader/"));
                     // If can't login,, show login window to user
@@ -112,31 +112,33 @@ namespace FeedLadder
 
             int group = (Windows.UI.Xaml.Application.Current as Application).GroupIndex;
             int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
-            if (group > -1)
+            if (group < 0) return;
+
+            // Set selection
+            SubscriptionListView.SelectedItem = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item];
+
+            if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead)
             {
-                if ((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].isRead)
+                for (int i = item + 1; i < (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group].Count; i++)
+                {
+                    if (!(Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i].isRead)
                     {
-                    for (int i = item + 1; i < (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group].Count; i++)
-                    {
-                        if (!(Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i].isRead)
-                        {
-                            SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i], ScrollIntoViewAlignment.Leading);
-                            return;
-                        }
+                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][i]);
+                        return;
                     }
-                    if (group > (Windows.UI.Xaml.Application.Current as Application).SubscriptionList.Count - 2)
-                    {
-                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item], ScrollIntoViewAlignment.Leading);
-                    }
-                    else
-                    {
-                        SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group + 1][0], ScrollIntoViewAlignment.Leading);
-                    }
+                }
+                if (group > (Windows.UI.Xaml.Application.Current as Application).SubscriptionList.Count - 2)
+                {
+                    SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item]);
                 }
                 else
                 {
-                    SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item], ScrollIntoViewAlignment.Leading);
+                    SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group + 1][0]);
                 }
+            }
+            else
+            {
+                SubscriptionListView.ScrollIntoView((Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item]);
             }
         }
 
@@ -308,6 +310,9 @@ namespace FeedLadder
                 (Windows.UI.Xaml.Application.Current as Application).SubscriptionList = source;
                 SubscriptionList.Source = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList;
 
+                // Reset selection
+                SubscriptionListView.SelectedIndex = -1;
+
                 if (subItems.Count > 0)
                     SubscriptionListResult.Visibility = Visibility.Visible;
                 else
@@ -335,7 +340,7 @@ namespace FeedLadder
                 if ((itemIndex = group.FindIndex(temp => temp.Equals(item))) > -1)
                 {
                     groupIndex = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList.FindIndex(temp => temp.Equals(group));                    
-                    (sender as ListView).SelectedItem = null;
+                    //(sender as ListView).SelectedItem = null;
                     (Windows.UI.Xaml.Application.Current as Application).GroupIndex = groupIndex;
                     (Windows.UI.Xaml.Application.Current as Application).ItemIndex = itemIndex;
                     if (SubFrame.Visibility == Visibility.Visible)

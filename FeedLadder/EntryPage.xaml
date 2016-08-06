@@ -16,9 +16,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="PageTitle" Text="EntryPageTitle" Margin="12,32,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
+        <TextBlock x:Name="PageTitle" Text="EntryTitle" Margin="12,24,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
 
-            <!--ContentPanel - 追加コンテンツをここに入力します-->
+        <!--ContentPanel - 追加コンテンツをここに入力します-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0">
             <TextBlock x:Name="NoBodyLabel" TextWrapping="Wrap" Text="No Body" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource TitleTextBlockStyle}" />
             <ProgressRing x:Name="ProgressIndicator" HorizontalAlignment="Center" VerticalAlignment="Center" Width="60" Height="60"/>

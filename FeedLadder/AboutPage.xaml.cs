@@ -1,4 +1,5 @@
 ﻿using System;
+using Windows.ApplicationModel;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
 
@@ -18,8 +19,10 @@ namespace FeedLadder
 
         private async void RateButton_Click(object sender, RoutedEventArgs e)
         {
-            var uriReview = new Uri(@"ms-windows-store://review/?ProductId=9nblgggzk2xs");
+            // https://github.com/Microsoft/Windows-task-snippets/blob/master/tasks/Store-app-rating-pop-up.md
+            var uriReview = new Uri($"ms-windows-store://REVIEW?PFN={Package.Current.Id.FamilyName}");
             var success = await Windows.System.Launcher.LaunchUriAsync(uriReview);
         }
+
     }
 }

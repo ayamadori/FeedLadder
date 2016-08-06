@@ -210,3 +210,12 @@ FakesAssemblies/
 GeneratedArtifacts/
 _Pvt_Extensions/
 ModelManifest.xml
+/FeedLadder/BundleArtifacts
+/FeedLadder/_scale-400.appx
+/FeedLadder/_scale-150.appx
+/FeedLadder/_scale-125.appx
+/FeedLadder/_scale-100.appx
+/FeedLadder/_pkginfo.txt
+/FeedLadder/Properties/Default.rd.xml
+/FeedLadder/project.json
+/FeedLadder/Package.StoreAssociation.xml

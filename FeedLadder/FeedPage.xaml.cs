@@ -7,6 +7,7 @@ using System.Runtime.Serialization.Json;
 using System.Text;
 using Windows.Storage;
 using Windows.System;
+using Windows.UI.Core;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
 using Windows.UI.Xaml.Controls;
@@ -336,7 +337,8 @@ namespace FeedLadder
                     }
                     else
                     {
-                        NextButton.IsEnabled = false;
+                        FeedListResult.Visibility = Visibility.Collapsed;
+                        NoItemLabel.Visibility = Visibility.Visible;
                     }
                 }                
             }
@@ -354,6 +356,18 @@ namespace FeedLadder
                 // Update timestamp
                 DateTime utcNow = DateTime.UtcNow;
                 timeStamp = UnixEpochTime.GetUnixTime(utcNow) + (60 * 60 * 9);
+            }
+
+            // Refresh MainPage (=> SubscriptionListView) in Tablet mode
+            if (!Frame.CanGoBack)
+            {
+                Frame rootFrame = Window.Current.Content as Frame;
+                rootFrame.Navigate(typeof(MainPage));
+
+                // Delete backstack
+                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                if (rootFrame.BackStack.Count > 0) rootFrame.BackStack.RemoveAt(rootFrame.BackStack.Count - 1);
+                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
             }
         }
 
@@ -388,6 +402,7 @@ namespace FeedLadder
                         group--;
                         item = (Application.Current as Application).SubscriptionList[group].Count - 1;
                         SubscriptionItem prev = (Application.Current as Application).SubscriptionList[group][item];
+
                         PageTitle.Text = prev.Title;
                         subscribeID = prev.SubscribeID;
                         Unread(subscribeID);
@@ -400,7 +415,8 @@ namespace FeedLadder
                     }
                     else
                     {
-                        PrevButton.IsEnabled = false;
+                        FeedListResult.Visibility = Visibility.Collapsed;
+                        NoItemLabel.Visibility = Visibility.Visible;
                     }
                 }
             }
@@ -418,6 +434,18 @@ namespace FeedLadder
                 // Update timestamp
                 DateTime utcNow = DateTime.UtcNow;
                 timeStamp = UnixEpochTime.GetUnixTime(utcNow) + (60 * 60 * 9);
+            }
+
+            // Refresh MainPage (=> SubscriptionListView) in Tablet mode
+            if (!Frame.CanGoBack)
+            {
+                Frame rootFrame = Window.Current.Content as Frame;
+                rootFrame.Navigate(typeof(MainPage));
+
+                // Delete backstack
+                // http://stackoverflow.com/questions/16243547/how-to-delete-page-from-navigation-stack-c-sharp-windows-8
+                if (rootFrame.BackStack.Count > 0) rootFrame.BackStack.RemoveAt(rootFrame.BackStack.Count - 1);
+                SystemNavigationManager.GetForCurrentView().AppViewBackButtonVisibility = rootFrame.CanGoBack ? AppViewBackButtonVisibility.Visible : AppViewBackButtonVisibility.Collapsed;
             }
         }
 
@@ -440,6 +468,14 @@ namespace FeedLadder
             {
                 SubFrame.Navigate(typeof(EntryPage));
             }
+        }
+
+        private async void PageTitle_Tapped(object sender, TappedRoutedEventArgs e)
+        {
+            int group = (Windows.UI.Xaml.Application.Current as Application).GroupIndex;
+            int item = (Windows.UI.Xaml.Application.Current as Application).ItemIndex;
+            string link = (Windows.UI.Xaml.Application.Current as Application).SubscriptionList[group][item].Link;
+            bool success = await Launcher.LaunchUriAsync(new Uri(link));
         }
     }
 }

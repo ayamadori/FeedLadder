@@ -28,9 +28,9 @@ namespace FeedLadder
             ShareOperation shareOperation = (ShareOperation)e.Parameter;
             string url = "";
 
-            if (shareOperation.Data.Contains(StandardDataFormats.Uri)) // URI
+            if (shareOperation.Data.Contains(StandardDataFormats.WebLink)) // URI
             {
-                Uri uri = await shareOperation.Data.GetUriAsync();
+                Uri uri = await shareOperation.Data.GetWebLinkAsync();
                 url = uri.AbsoluteUri;
 
                 Debug.WriteLine("Uri: " + url);

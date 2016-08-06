@@ -135,6 +135,12 @@ namespace FeedLadder
         [DataMember(Name = "rate")]
         public string Rate { get; set; }
 
+        /// <summary>
+        /// link
+        /// </summary>
+        [DataMember(Name = "link")]
+        public string Link { get; set; }
+
         // read flag
         public bool isRead { get; set; }
         //private bool _isread;

@@ -13,9 +13,9 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
         
-        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="12,16,0,0">
+        <StackPanel x:Name="TitlePanel" Grid.Row="0" Margin="10,14,0,0">
             <TextBlock x:Name="ApplicationTitle" Text="FEEDLADDER" Style="{StaticResource BaseTextBlockStyle}" FontWeight="Bold"/>
-            <TextBlock x:Name="PageTitle" Text="Settings" Margin="0,16,0,0" Style="{StaticResource TitleTextBlockStyle}"/>
+            <TextBlock x:Name="PageTitle" Text="Settings" Margin="0,20,0,0" Style="{StaticResource TitleTextBlockStyle}"/>
         </StackPanel>
         
         <Grid x:Name="RootGrid" Grid.Row="1" Margin="12,20,12,12">
@@ -25,7 +25,7 @@
                 <TextBlock Text="Account" Style="{StaticResource TitleTextBlockStyle}" Margin="0,24,0,12"/>
                 <TextBlock Text="Username" Margin="0,0,0,8"/>
                 <TextBox x:Name="UsernameTextBox" Text="username" IsReadOnly="True" Width="280" HorizontalAlignment="Left"/>
-                <Button x:Name="LogoutButton" Content="Logout from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,24"/>
+                <Button x:Name="LogoutButton" Content="Log Out from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,24"/>
             </StackPanel>
         </Grid>
     </Grid>

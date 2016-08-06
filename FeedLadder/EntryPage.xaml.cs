@@ -66,24 +66,16 @@ namespace FeedLadder
 
         private string formatHTML(string source)
         {
-            // Get color resource and convert ARGB to RGB (#AARRGGBB -> #RRGGBB)
-            //string backgroundColor = (Windows.UI.Xaml.Application.Current.Resources["ApplicationPageBackgroundThemeBrush"] as SolidColorBrush).Color.ToString().Remove(1, 2);
-            //string textColor = (Windows.UI.Xaml.Application.Current.Resources["ApplicationPageForegroundThemeBrush"] as SolidColorBrush).Color.ToString().Remove(1, 2);
-            //string linkColor = (Windows.UI.Xaml.Application.Current.Resources["ApplicationPageForegroundThemeBrush"] as SolidColorBrush).Color.ToString().Remove(1, 2);
-
-            // from http://stackoverflow.com/questions/9124166/how-to-make-webbrowser-control-with-black-background-in-windows-phone-7-1
-            // The min-width/max-width property is enabled only under the strict !DOCTYPE. => add "<!DOCTYPE html>" on top
-            // from http://msdn.microsoft.com/en-us/library/ie/ms530811(v=vs.85).aspx
-            //string header = "<!DOCTYPE html><html><head><meta name=\"viewport\" content=\"width=device-width, user-scalable=0\"/><style type=\"text/css\">body{background-color: " + backgroundColor + "; color: " + textColor + ";}a:link{color: " + linkColor + ";}img{max-width: 100%; width: auto; height: auto;}</style></head><body>";
             // Don't use DOCTYPE https://msdn.microsoft.com/ja-jp/library/dn384051(v=vs.85).aspx
             // Fit to device width https://msdn.microsoft.com/ja-jp/library/hh869615(v=vs.85).aspx
-            string header = "<html><head><style type=\"text/css\">@-ms-viewport { width: device-width; } img {max-width: 100%; width: auto; height: auto;}</style></head><body>";
+            string header = "<html><head><style type=\"text/css\">@-ms-viewport {width: device-width; zoom: 1.0;} img {max-width: 100%; width: auto; height: auto;}</style></head><body>";
             string footer = "</body></html>";
             //source.Replace("\'", "&#039;");
             source.Replace("<html>", "");
             source.Replace("<body>", "");
             source.Replace("</body>", "");
             source.Replace("</html>", "");
+            System.Text.RegularExpressions.Regex.Replace(source, "<head*/head>","");
             source = header + source + footer;
             return source;
         }
