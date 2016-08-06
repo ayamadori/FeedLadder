@@ -18,7 +18,7 @@ https://www.microsoft.com/ja-jp/store/apps/feedladder/9nblgggzk2xs
 Copyright (c) DWANGO Co., Ltd All Rights Reserved.
 
 ## Test
-Tested on Windows 10 Mobile emulator(10586) in Windows 10 SDK, Windows 10 Version 1511
+Tested on Windows 10 Mobile emulator(14393) in Windows 10 SDK, Windows 10 Version 1607, MADOSMA Q501
 
 ## License
 GNU GENERAL PUBLIC LICENSE Version 3  
