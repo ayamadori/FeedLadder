@@ -1,7 +1,8 @@
 Feedladder
 ==========
 
-A simple and unofficial client for Live Dwango Reader (formerly "livedoor Reader", http://reader.livedwango.com/).  
+A simple and unofficial client for Live Dwango Reader  
+(formerly "livedoor Reader", http://reader.livedwango.com/).  
 https://www.microsoft.com/ja-jp/store/apps/feedladder/9nblgggzk2xs
 
 ## Feature
@@ -24,7 +25,7 @@ GNU GENERAL PUBLIC LICENSE Version 3
 http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Version History
-- Version 2.1.2
+- Version 2.1.3
  * Minor fix and improvements
 
 - Version 2.1.0
