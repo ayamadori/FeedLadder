@@ -26,7 +26,7 @@ http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Version History
 - Version 2.1.3
- * Minor fix and improvements
+ * Minor fixes and improvements
 
 - Version 2.1.0
  * Support responsive(?) UI
