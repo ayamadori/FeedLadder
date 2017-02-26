@@ -1,7 +1,8 @@
 Feedladder
 ==========
 
-A simple and unofficial client for Live Dwango Reader (formerly "livedoor Reader", http://reader.livedwango.com/).  
+A simple and unofficial client for Live Dwango Reader  
+(formerly "livedoor Reader", http://reader.livedwango.com/).  
 https://www.microsoft.com/ja-jp/store/apps/feedladder/9nblgggzk2xs
 
 ## Feature
@@ -17,15 +18,15 @@ https://www.microsoft.com/ja-jp/store/apps/feedladder/9nblgggzk2xs
 Copyright (c) DWANGO Co., Ltd All Rights Reserved.
 
 ## Test
-Tested on Windows 10 Mobile emulator(10586) in Windows 10 SDK, Windows 10 Version 1511
+Tested on Windows 10 Mobile emulator(14393) in Windows 10 SDK, Windows 10 Version 1607, MADOSMA Q501
 
 ## License
 GNU GENERAL PUBLIC LICENSE Version 3  
 http://www.gnu.org/licenses/gpl-3.0.html
 
 ## Version History
-- Version 2.1.2
- * Minor fix and improvements
+- Version 2.1.3
+ * Minor fixes and improvements
 
 - Version 2.1.0
  * Support responsive(?) UI
