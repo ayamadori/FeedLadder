@@ -1,0 +1,28 @@
+﻿<ContentDialog
+    x:Class="FeedLadder.AboutDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeedLadder"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="About"
+    SecondaryButtonText="Back"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+
+    <Grid>
+        <ScrollViewer>
+            <StackPanel Margin="0,12">
+                <TextBlock Text="Feedladder&#xA;Version 2.1.4&#xA;&#xA;Copyright (c) Ayamadori" TextWrapping="Wrap"/>
+                <HyperlinkButton Content="https://sites.google.com/site/ayamadori/" NavigateUri="https://sites.google.com/site/ayamadori"/>
+                <HyperlinkButton Content="Twitter: @ayamadori" NavigateUri="https://twitter.com/ayamadori"/>
+                <Button Content="Rate this app" Margin="0,32" Click="RateButton_Click"/>
+                <TextBlock Text="Live Dwango Reader" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                <TextBlock Text="Copyright (c) DWANGO Co.,Ltd All Rights Reserved." TextWrapping="Wrap"/>
+                <HyperlinkButton Content="Official Site" NavigateUri="http://reader.livedwango.com"/>
+                <HyperlinkButton Content="Official Blog" NavigateUri="http://blog.livedoor.jp/staff_reader/"/>
+                <HyperlinkButton Content="Official Twitter: @LDReader" NavigateUri="https://twitter.com/ldreader"/>
+            </StackPanel>
+        </ScrollViewer>
+    </Grid>
+</ContentDialog>

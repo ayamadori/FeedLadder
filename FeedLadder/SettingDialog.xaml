@@ -1,0 +1,26 @@
+﻿<ContentDialog
+    x:Class="FeedLadder.SettingDialog"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:local="using:FeedLadder"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    mc:Ignorable="d"
+    Title="Settings"
+    SecondaryButtonText="Back"
+    SecondaryButtonClick="ContentDialog_SecondaryButtonClick">
+
+    <Grid>
+        <StackPanel Margin="0,12">
+            <ToggleSwitch x:Name="AdBlockSwitch" Header="Block ad feeds" Toggled="AdBlockSwitch_Toggled"/>
+            <ComboBox x:Name="SortModeComboBox" Header="Sort" SelectionChanged="SortModeComboBox_SelectionChanged" Margin="0,12" Width="280">
+                <ComboBoxItem Content="Folder"/>
+                <ComboBoxItem Content="Rating"/>
+            </ComboBox>
+            <TextBlock Text="Account" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,12"/>
+            <TextBlock Text="Username" Margin="0,0,0,8"/>
+            <TextBox x:Name="UsernameTextBox" Text="username" IsReadOnly="True" Width="280" HorizontalAlignment="Left"/>
+            <Button x:Name="LogoutButton" Content="Log Out from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,24,0,0"/>
+        </StackPanel>
+    </Grid>
+</ContentDialog>

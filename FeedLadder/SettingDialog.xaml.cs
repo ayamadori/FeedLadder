@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections.ObjectModel;
 using Windows.Storage;
 using Windows.UI.Popups;
 using Windows.UI.Xaml;
@@ -8,54 +7,40 @@ using Windows.UI.Xaml.Navigation;
 using Windows.Web.Http;
 using Windows.Web.Http.Filters;
 
-// 空白ページのアイテム テンプレートについては、http://go.microsoft.com/fwlink/?LinkId=234238 を参照してください
+// The Content Dialog item template is documented at http://go.microsoft.com/fwlink/?LinkId=234238
 
 namespace FeedLadder
 {
-    /// <summary>
-    /// それ自体で使用できる空白ページまたはフレーム内に移動できる空白ページ。
-    /// </summary>
-    public sealed partial class SettingPage : Page
+    public sealed partial class SettingDialog : ContentDialog
     {
         private const string domainURL = "http://reader.livedwango.com";
         private const string logoutURL = "http://member.livedoor.com/login/logout";
 
-        public SettingPage()
+        public SettingDialog(string parameter)
         {
             this.InitializeComponent();
 
-            ObservableCollection<string> items = new ObservableCollection<string>();
-            items.Add("Folder");
-            items.Add("Rating");
-            SortModeComboBox.DataContext = items;
+            var roamingSettings = ApplicationData.Current.RoamingSettings;
+            // Read data from a simple setting
+            string sortMode = roamingSettings.Values["SortModeString"] as string;
+            if (sortMode == null)
+            {
+                // Default is Folder
+                sortMode = "Folder";
+                roamingSettings.Values["SortModeString"] = sortMode;
+            }
+            SortModeComboBox.SelectedIndex = (sortMode == "Folder")? 0 : 1;
+            object adBlockEnable = roamingSettings.Values["AdBlockEnableBool"];
+            if (adBlockEnable == null)
+                AdBlockSwitch.IsOn = false; // Default is no blocking
+            else
+                AdBlockSwitch.IsOn = (bool)adBlockEnable;
+
+            UsernameTextBox.Text = (parameter == null)? "(No login)" : parameter;
         }
 
-        protected override void OnNavigatedTo(NavigationEventArgs e)
+        private void ContentDialog_SecondaryButtonClick(ContentDialog sender, ContentDialogButtonClickEventArgs args)
         {
-            base.OnNavigatedTo(e);
-
-            if (e.NavigationMode == NavigationMode.New)
-            {
-                var roamingSettings = ApplicationData.Current.RoamingSettings;
-                // Read data from a simple setting
-                string sortMode = roamingSettings.Values["SortModeString"] as string;
-                if (sortMode == null)
-                {
-                    // Default is Folder
-                    sortMode = "Folder";
-                    roamingSettings.Values["SortModeString"] = sortMode;
-                }
-                SortModeComboBox.SelectedItem = sortMode;
-                object adBlockEnable = roamingSettings.Values["AdBlockEnableBool"];
-                if (adBlockEnable == null)
-                    AdBlockSwitch.IsOn = false; // Default is no blocking
-                else
-                    AdBlockSwitch.IsOn = (bool)adBlockEnable;
-
-                string userName = e.Parameter as string;
-                if (userName == null) userName = "(No login)";
-                UsernameTextBox.Text = userName;
-            }
         }
 
         private void AdBlockSwitch_Toggled(object sender, RoutedEventArgs e)
@@ -67,7 +52,7 @@ namespace FeedLadder
         private void SortModeComboBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
         {
             var roamingSettings = ApplicationData.Current.RoamingSettings;
-            roamingSettings.Values["SortModeString"] = SortModeComboBox.SelectedItem as string;
+            roamingSettings.Values["SortModeString"] = (SortModeComboBox.SelectedItem as ComboBoxItem).Content as string;
         }
 
         private async void LogoutButton_Click(object sender, RoutedEventArgs e)
