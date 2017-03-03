@@ -170,7 +170,6 @@ namespace FeedLadder
 
         private async void SettingButton_Click(object sender, RoutedEventArgs e)
         {
-            //Frame.Navigate(typeof(SettingPage), userName);
             // https://msdn.microsoft.com/en-us/library/windows/apps/windows.ui.xaml.controls.contentdialog.aspx
             var dlg = new SettingDialog(userName);
             await dlg.ShowAsync();
@@ -178,7 +177,6 @@ namespace FeedLadder
 
         private async void AboutButton_Click(object sender, RoutedEventArgs e)
         {
-            //Frame.Navigate(typeof(AboutPage));
             // https://msdn.microsoft.com/en-us/library/windows/apps/windows.ui.xaml.controls.contentdialog.aspx
             var dlg = new AboutDialog();
             await dlg.ShowAsync();
