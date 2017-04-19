@@ -36,11 +36,14 @@ namespace FeedLadder
                 Debug.WriteLine("Uri: " + url);
             }
 
-            // Delay before opening map (I can't understand necessity...)
+            // Delay before opening browser (I can't understand necessity...)
             // http://blog.okazuki.jp/entry/20120302/1330643881
             await Task.Delay(TimeSpan.FromMilliseconds(1000));
 
             Subscribe(url);
+
+            // Exit app
+            Windows.UI.Xaml.Application.Current.Exit();
         }
 
         private async void Subscribe(string url)

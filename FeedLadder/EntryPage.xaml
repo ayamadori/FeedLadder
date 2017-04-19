@@ -16,7 +16,7 @@
             <RowDefinition Height="Auto"/>
         </Grid.RowDefinitions>
 
-        <TextBlock x:Name="PageTitle" Text="EntryTitle" Margin="12,24,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
+        <TextBlock x:Name="PageTitle" Text="EntryTitle" Margin="12,8,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap"/>
 
         <!--ContentPanel - 追加コンテンツをここに入力します-->
         <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0">

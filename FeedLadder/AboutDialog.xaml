@@ -16,8 +16,8 @@
                 <TextBlock Text="Feedladder&#xA;Version 2.1.4&#xA;&#xA;Copyright (c) Ayamadori" TextWrapping="Wrap"/>
                 <HyperlinkButton Content="https://sites.google.com/site/ayamadori/" NavigateUri="https://sites.google.com/site/ayamadori"/>
                 <HyperlinkButton Content="Twitter: @ayamadori" NavigateUri="https://twitter.com/ayamadori"/>
-                <Button Content="Rate this app" Margin="0,32" Click="RateButton_Click"/>
-                <TextBlock Text="Live Dwango Reader" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,0,0,12"/>
+                <Button Content="Rate this app" Margin="0,12" Click="RateButton_Click"/>
+                <TextBlock Text="Live Dwango Reader" Style="{StaticResource TitleTextBlockStyle}" Margin="0,12"/>
                 <TextBlock Text="Copyright (c) DWANGO Co.,Ltd All Rights Reserved." TextWrapping="Wrap"/>
                 <HyperlinkButton Content="Official Site" NavigateUri="http://reader.livedwango.com"/>
                 <HyperlinkButton Content="Official Blog" NavigateUri="http://blog.livedoor.jp/staff_reader/"/>

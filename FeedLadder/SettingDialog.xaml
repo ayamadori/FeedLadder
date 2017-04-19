@@ -14,13 +14,13 @@
         <ScrollViewer>
             <StackPanel Margin="0,12">
                 <ToggleSwitch x:Name="AdBlockSwitch" Header="Block ad feeds" Toggled="AdBlockSwitch_Toggled"/>
-                <ComboBox x:Name="SortModeComboBox" Header="Sort" SelectionChanged="SortModeComboBox_SelectionChanged" Margin="0,12,24,0" HorizontalAlignment="Stretch">
+                <ComboBox x:Name="SortModeComboBox" Header="Sort" SelectionChanged="SortModeComboBox_SelectionChanged" HorizontalAlignment="Stretch">
                     <ComboBoxItem Content="Folder"/>
                     <ComboBoxItem Content="Rating"/>
                 </ComboBox>
-                <TextBlock Text="Account" Style="{StaticResource SubtitleTextBlockStyle}" Margin="0,24,0,0"/>
-                <TextBox x:Name="UsernameTextBox" Header="Username" Text="username" IsReadOnly="True" Margin="0,12,24,0" HorizontalAlignment="Stretch"/>
-                <Button x:Name="LogoutButton" Content="Log Out from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,24,0,0"/>
+                <TextBlock Text="Account" Style="{StaticResource TitleTextBlockStyle}" Margin="0,24,0,4"/>
+                <TextBox x:Name="UsernameTextBox" Header="Username" Text="username" IsReadOnly="True" HorizontalAlignment="Stretch"/>
+                <Button x:Name="LogoutButton" Content="Log Out from Live Dwango Reader" Click="LogoutButton_Click" Margin="0,12"/>
             </StackPanel>
         </ScrollViewer>
     </Grid>

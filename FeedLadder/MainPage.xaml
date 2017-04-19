@@ -100,7 +100,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <Pivot x:Name="RootPivot" Grid.Row="0" Grid.Column="0" Title="FEEDLADDER" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
+            <Pivot x:Name="RootPivot" Grid.Row="0" Grid.Column="0" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" SelectionChanged="RootPivot_SelectionChanged">
                 <PivotItem Header="unread">
                     <Grid>
                         <TextBlock x:Name="NoItemLabel" Text="No Item" Visibility="Collapsed" Foreground="Gray" Style="{StaticResource SubtitleTextBlockStyle}" Margin="12,12,0,0"/>

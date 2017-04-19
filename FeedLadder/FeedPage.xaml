@@ -67,7 +67,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock x:Name="PageTitle" Text="Feeds" Margin="12,24,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" Tapped="PageTitle_Tapped"/>
+            <TextBlock x:Name="PageTitle" Text="Feeds" Margin="12,8,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" Tapped="PageTitle_Tapped"/>
 
             <!--If ManipulationMode is "System,TranlationX,TranslationY", can't tap item in Mobile...-->
             <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0" ManipulationMode="All" ManipulationCompleted="ContentPanel_ManipulationCompleted">
