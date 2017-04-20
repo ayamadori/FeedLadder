@@ -67,7 +67,7 @@
                 <RowDefinition Height="Auto"/>
             </Grid.RowDefinitions>
 
-            <TextBlock x:Name="PageTitle" Text="Feeds" Margin="12,8,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" Tapped="PageTitle_Tapped"/>
+            <TextBlock x:Name="PageTitle" Text="Feeds" Margin="12,24,0,0" Style="{StaticResource TitleTextBlockStyle}" TextWrapping="NoWrap" Tapped="PageTitle_Tapped"/>
 
             <!--If ManipulationMode is "System,TranlationX,TranslationY", can't tap item in Mobile...-->
             <Grid x:Name="ContentPanel" Grid.Row="1" Margin="12,12,12,0" ManipulationMode="All" ManipulationCompleted="ContentPanel_ManipulationCompleted">
@@ -86,12 +86,12 @@
                 <CommandBar.Content>
                     <Grid/>
                 </CommandBar.Content>
-                <AppBarButton x:Name="PrevButton" Label="prev" Click="PrevButton_Click">
+                <AppBarButton x:Name="PrevButton" Label="Prev" Click="PrevButton_Click">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76B;"/>
                     </AppBarButton.Icon>
                 </AppBarButton>
-                <AppBarButton x:Name="NextButton" Label="next" Click="NextButton_Click">
+                <AppBarButton x:Name="NextButton" Label="Next" Click="NextButton_Click">
                     <AppBarButton.Icon>
                         <FontIcon FontFamily="Segoe MDL2 Assets" Glyph="&#xE76C;"/>
                     </AppBarButton.Icon>
